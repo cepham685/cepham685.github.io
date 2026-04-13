@@ -1,0 +1,58 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { projects } from "../data/projects";
+---
+
+<Layout title="Work — Christina Pham" description="Selected graphic design projects by Christina Pham">
+  <section class="page-header">
+    <h1 class="reveal">Work</h1>
+    <p class="reveal">Selected projects in brand identity, editorial, and visual systems.</p>
+  </section>
+
+  <section class="work-grid">
+    <div class="grid reveal-stagger">
+      {projects.map((project, i) => (
+        <ProjectCard project={project} index={i} />
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-header {
+    padding: clamp(4rem, 10vh, 7rem) 0 clamp(3rem, 6vh, 5rem);
+    max-width: 600px;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 5rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .page-header p {
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    line-height: 1.6;
+  }
+
+  .work-grid {
+    padding-bottom: clamp(4rem, 10vh, 8rem);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3.5rem 2rem;
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

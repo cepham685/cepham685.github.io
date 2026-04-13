@@ -1,0 +1,168 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="About — Christina Pham" description="About Christina Pham, graphic designer">
+  <section class="about">
+    <div class="about-header reveal">
+      <h1>About</h1>
+    </div>
+
+    <div class="about-content">
+      <div class="portrait reveal">
+        <div class="portrait-placeholder"></div>
+      </div>
+
+      <div class="text">
+        <div class="bio reveal">
+          <p>
+            I'm a graphic designer based in San Francisco with a focus on brand identity,
+            editorial design, and visual systems. I believe in design that is both visually
+            compelling and strategically grounded — work that resonates and endures.
+          </p>
+          <p>
+            I partner with startups and established brands alike to develop thoughtful,
+            lasting visual language. Every project begins with listening, understanding the
+            problem, and crafting a solution that feels inevitable.
+          </p>
+          <p>
+            Previously at [Studio / Agency]. Currently available for freelance projects
+            and creative collaborations.
+          </p>
+        </div>
+
+        <div class="columns reveal">
+          <div class="column">
+            <h2>Capabilities</h2>
+            <ul>
+              <li>Brand Identity</li>
+              <li>Art Direction</li>
+              <li>Editorial Design</li>
+              <li>Packaging</li>
+              <li>Typography</li>
+              <li>Visual Systems</li>
+            </ul>
+          </div>
+          <div class="column">
+            <h2>Select Clients</h2>
+            <ul>
+              <li>Client A</li>
+              <li>Client B</li>
+              <li>Client C</li>
+              <li>Client D</li>
+            </ul>
+          </div>
+          <div class="column">
+            <h2>Connect</h2>
+            <ul>
+              <li><a href="mailto:hello@example.com">Email</a></li>
+              <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+              <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a></li>
+              <li><a href="https://read.cv" target="_blank" rel="noopener">Read.cv</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .about {
+    padding-bottom: clamp(4rem, 10vh, 8rem);
+  }
+
+  .about-header {
+    padding: clamp(4rem, 10vh, 7rem) 0 clamp(3rem, 6vh, 5rem);
+  }
+
+  .about-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 5rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .portrait-placeholder {
+    aspect-ratio: 3/4;
+    background-color: var(--color-surface);
+    width: 100%;
+  }
+
+  .bio {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+  }
+
+  .bio p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #333;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  h2 {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  ul li {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  ul a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s;
+  }
+
+  ul a:hover {
+    text-decoration-color: var(--color-text);
+  }
+
+  @media (max-width: 768px) {
+    .about-content {
+      grid-template-columns: 1fr;
+    }
+
+    .portrait {
+      max-width: 400px;
+    }
+
+    .columns {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 1.5rem;
+    }
+  }
+</style>

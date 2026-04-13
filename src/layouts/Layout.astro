@@ -1,0 +1,382 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Graphic design portfolio of Christina Pham" } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: "/work", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "mailto:hello@example.com", label: "Contact" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/" class="wordmark">Christina Pham</a>
+        <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+        </button>
+        <ul class="nav-links">
+          {navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class={currentPath.startsWith(link.href) && link.href !== "mailto:hello@example.com" ? "active" : ""}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+
+    <div class="overlay-menu" aria-hidden="true">
+      <ul>
+        {navLinks.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-left">
+          <p class="footer-name">Christina Pham</p>
+          <p class="footer-tagline">Graphic Designer</p>
+        </div>
+        <div class="footer-right">
+          <a href="mailto:hello@example.com">hello@example.com</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; {new Date().getFullYear()} Christina Pham</p>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      const toggle = document.querySelector(".menu-toggle") as HTMLButtonElement;
+      const overlay = document.querySelector(".overlay-menu") as HTMLElement;
+
+      toggle?.addEventListener("click", () => {
+        const expanded = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", String(!expanded));
+        toggle.classList.toggle("open");
+        overlay.classList.toggle("open");
+        document.body.classList.toggle("menu-open");
+      });
+
+      // Scroll reveal animation
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("revealed");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+      );
+
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --color-bg: #f5f5f0;
+    --color-surface: #eaeae5;
+    --color-text: #141414;
+    --color-muted: #7a7a7a;
+    --color-border: #ddddd8;
+    --color-accent: #2a2af6;
+    --font-body: "Inter", system-ui, -apple-system, sans-serif;
+    --font-display: "Instrument Serif", Georgia, serif;
+    --max-width: 1280px;
+    --page-padding: clamp(1.25rem, 3vw, 2.5rem);
+  }
+
+  html {
+    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  main {
+    flex: 1;
+    padding: 0 var(--page-padding);
+    max-width: var(--max-width);
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger children */
+  .reveal-stagger > .reveal:nth-child(2) { transition-delay: 0.08s; }
+  .reveal-stagger > .reveal:nth-child(3) { transition-delay: 0.16s; }
+  .reveal-stagger > .reveal:nth-child(4) { transition-delay: 0.24s; }
+  .reveal-stagger > .reveal:nth-child(5) { transition-delay: 0.32s; }
+  .reveal-stagger > .reveal:nth-child(6) { transition-delay: 0.4s; }
+</style>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-bg);
+    padding: 1.25rem var(--page-padding);
+    transition: box-shadow 0.3s;
+  }
+
+  nav {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    z-index: 110;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--color-muted);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color 0.25s;
+  }
+
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--color-text);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--color-text);
+  }
+
+  .nav-links a:hover::after,
+  .nav-links a.active::after {
+    width: 100%;
+  }
+
+  /* Mobile menu button */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 110;
+  }
+
+  .menu-bar {
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: var(--color-text);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  .menu-toggle.open .menu-bar:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+
+  .menu-toggle.open .menu-bar:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+
+  /* Full-screen overlay menu */
+  .overlay-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 105;
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+  }
+
+  .overlay-menu.open {
+    display: flex;
+  }
+
+  .overlay-menu ul {
+    list-style: none;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .overlay-menu a {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    line-height: 1.1;
+    transition: color 0.2s;
+  }
+
+  .overlay-menu a:hover {
+    color: var(--color-accent);
+  }
+
+  /* Footer */
+  footer {
+    margin-top: auto;
+    padding: 3rem var(--page-padding) 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 3rem;
+  }
+
+  .footer-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .footer-right a {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+  }
+
+  .footer-right a:hover {
+    color: var(--color-text);
+  }
+
+  .footer-bottom {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .footer-bottom p {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: flex;
+    }
+  }
+</style>

@@ -1,0 +1,135 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { projects } from "../data/projects";
+
+const featured = projects.filter((p) => p.featured);
+---
+
+<Layout title="Christina Pham — Graphic Designer">
+  <section class="hero">
+    <h1 class="reveal">
+      Graphic designer crafting <em>brand identities</em>,
+      editorial systems, and visual narratives.
+    </h1>
+    <div class="hero-sub reveal">
+      <p>Based in San Francisco — Available for select projects</p>
+    </div>
+  </section>
+
+  <section class="selected-work">
+    <div class="section-label reveal">
+      <span class="label-text">Selected Work</span>
+      <span class="label-line"></span>
+    </div>
+    <div class="grid reveal-stagger">
+      {featured.map((project, i) => (
+        <ProjectCard project={project} index={i} />
+      ))}
+    </div>
+    <div class="view-all reveal">
+      <a href="/work" class="link-arrow">
+        All Projects
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    padding: clamp(6rem, 15vh, 10rem) 0 clamp(5rem, 12vh, 8rem);
+    max-width: 820px;
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .hero em {
+    font-style: italic;
+  }
+
+  .hero-sub {
+    margin-top: 1.75rem;
+  }
+
+  .hero-sub p {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    letter-spacing: 0.01em;
+  }
+
+  .selected-work {
+    padding-bottom: clamp(4rem, 10vh, 8rem);
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .label-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .label-line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 2rem;
+  }
+
+  .view-all {
+    margin-top: 3rem;
+    text-align: center;
+  }
+
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    transition: color 0.25s;
+  }
+
+  .link-arrow svg {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .link-arrow:hover {
+    color: var(--color-text);
+  }
+
+  .link-arrow:hover svg {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

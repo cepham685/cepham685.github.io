@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/opt/homebrew/bin/node --version)",
+      "Bash(/usr/local/bin/node --version)",
+      "Bash(/opt/homebrew/bin/brew --version)",
+      "Bash(/usr/local/bin/brew --version)",
+      "Bash(brew --version)",
+      "Bash(/opt/homebrew/bin/brew install:*)",
+      "Bash(/opt/homebrew/bin/npm create:*)",
+      "Bash(/opt/homebrew/bin/node /opt/homebrew/bin/npm create astro@latest . -- --template minimal --typescript strict --install --no-git --yes)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js create astro@latest . -- --template minimal --typescript strict --install --no-git --yes)",
+      "Bash(mv \"/Users/christinapham/Claude Portfolio/lonely-limit/\"* \"/Users/christinapham/Claude Portfolio/\")",
+      "Bash(mv \"/Users/christinapham/Claude Portfolio/lonely-limit/\".* \"/Users/christinapham/Claude Portfolio/\")",
+      "Bash(npm run:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(/opt/homebrew/bin/node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const p=JSON.parse\\(d\\); console.log\\(p.bin\\)\")",
+      "WebFetch(domain:kaeptive.com)",
+      "WebFetch(domain:panoply.co.uk)",
+      "WebFetch(domain:thelocals.dk)",
+      "WebFetch(domain:shy.studio)",
+      "WebFetch(domain:takeagander.com)",
+      "WebFetch(domain:grandmatter.com)",
+      "WebFetch(domain:www.tinasmithdesign.com)",
+      "WebFetch(domain:futureparis.com)"
+    ]
+  }
+}
