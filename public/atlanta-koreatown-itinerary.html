@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlanta · Koreatown — Jul 2–5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --char:#16130E;      /* deepest roasted charcoal */
+    --ember:#201B14;     /* card surface */
+    --ash:#2B251C;       /* raised / hover */
+    --line:#39301F;      /* hairlines */
+    --cream:#F2EADB;     /* primary text, warm */
+    --smoke:#A99E8B;     /* muted text */
+    --faint:#766C5B;     /* faintest */
+    --gochu:#E2563B;     /* feast — gochujang red */
+    --jade:#5FA686;      /* move — soju jade */
+    --gold:#E7B450;      /* reset — banchan gold */
+    --spark:#7C97DC;     /* event — night indigo */
+    --stay:#9b9080;      /* stay — neutral */
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--char);
+    color:var(--cream);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:0 18px 80px;
+  }
+  .wrap{max-width:680px;margin:0 auto}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .kicker{
+    font-family:"Space Mono",monospace;
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--gochu);margin-bottom:18px;
+  }
+  .kicker span{color:var(--faint)}
+  h1{
+    font-family:"Bricolage Grotesque",sans-serif;
+    font-weight:800;font-size:clamp(40px,12vw,76px);line-height:.94;
+    letter-spacing:-.02em;margin-bottom:18px;
+  }
+  h1 .g- {display:block}
+  h1 em{font-style:normal;color:var(--gochu)}
+  .thesis{font-size:16px;color:var(--smoke);max-width:34ch}
+  .thesis b{color:var(--cream);font-weight:600}
+
+  /* ---------- LEGEND ---------- */
+  .legend{
+    display:flex;flex-wrap:wrap;gap:8px 14px;
+    margin-top:26px;font-family:"Space Mono",monospace;font-size:11px;
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  .lg{display:inline-flex;align-items:center;gap:7px;color:var(--smoke)}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+  .d-feast{background:var(--gochu)} .d-move{background:var(--jade)}
+  .d-reset{background:var(--gold)} .d-event{background:var(--spark)}
+  .d-stay{background:var(--stay)}
+
+  /* ---------- DAY ---------- */
+  .day{padding:38px 0 6px;border-bottom:1px solid var(--line)}
+  .day-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:4px}
+  .day-eyebrow{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:6px;
+  }
+  .day-title{
+    font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
+    font-size:clamp(26px,7vw,38px);letter-spacing:-.015em;line-height:1;
+  }
+  .day-tag{font-size:13px;color:var(--smoke);margin-top:7px}
+  .ribbon{display:flex;gap:5px;padding-bottom:6px;flex-shrink:0}
+  .ribbon i{width:14px;height:6px;border-radius:3px;opacity:.9}
+
+  /* ---------- ENTRIES ---------- */
+  .entries{margin-top:22px;display:flex;flex-direction:column}
+  .entry{
+    display:grid;grid-template-columns:78px 1fr;gap:16px;
+    padding:18px 0;border-top:1px solid rgba(57,48,31,.55);
+    position:relative;
+  }
+  .entry:first-child{border-top:none}
+  .time{
+    font-family:"Space Mono",monospace;font-size:13px;color:var(--gold);
+    padding-top:2px;white-space:nowrap;letter-spacing:.02em;
+  }
+  .time small{display:block;color:var(--faint);font-size:11px;letter-spacing:.04em;margin-top:3px}
+  .e-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em;line-height:1.15}
+  .e-head{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:6px}
+  .tag{
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    padding:3px 7px;border-radius:4px;line-height:1;flex-shrink:0;
+  }
+  .t-feast{background:rgba(226,86,59,.16);color:#f08e76}
+  .t-move{background:rgba(95,166,134,.16);color:#84c9a7}
+  .t-reset{background:rgba(231,180,80,.15);color:#eccb7e}
+  .t-event{background:rgba(124,151,220,.16);color:#a3b6ea}
+  .t-stay{background:rgba(155,144,128,.15);color:#bcb1a0}
+  .rating{font-family:"Space Mono",monospace;font-size:11px;color:var(--smoke);white-space:nowrap}
+  .rating b{color:var(--gold);font-weight:700}
+  .tip{font-size:14.5px;color:var(--smoke);max-width:46ch}
+  .tip b{color:var(--cream);font-weight:600}
+  .flag{color:var(--gochu);font-weight:600}
+  .alt{font-size:13px;color:var(--faint);margin-top:7px}
+  .alt b{color:var(--smoke);font-weight:500}
+  .map{
+    display:inline-flex;align-items:center;gap:5px;margin-top:9px;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--cream);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;
+    transition:color .15s,border-color .15s;
+  }
+  .map:hover{color:var(--gochu);border-color:var(--gochu)}
+  .map svg{width:11px;height:11px;flex-shrink:0}
+
+  /* note bar that spans within a day */
+  .note{
+    grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;
+    background:var(--ember);border:1px solid var(--line);border-radius:10px;
+    padding:13px 15px;margin-top:4px;font-size:13.5px;color:var(--smoke);
+  }
+  .note b{color:var(--cream);font-weight:600}
+  .note .pin{color:var(--gold);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;padding-top:1px}
+
+  /* fireworks micro-flourish on the Jul 4 event */
+  .spark-host{position:relative}
+  .spark-host .time small{color:var(--spark)}
+
+  /* ---------- EXTRA ---------- */
+  .extra{padding:40px 0 0}
+  .extra h2{
+    font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;
+    letter-spacing:-.015em;margin-bottom:5px;
+  }
+  .extra .sub{font-size:14px;color:var(--smoke);margin-bottom:22px}
+  .burn{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .card{
+    background:var(--ember);border:1px solid var(--line);border-radius:12px;padding:16px;
+  }
+  .card .ct{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .card .cd{font-size:13px;color:var(--smoke);margin-bottom:10px}
+  .card .map{margin-top:0}
+
+  .know{margin-top:30px;background:linear-gradient(180deg,var(--ember),rgba(32,27,20,.4));border:1px solid var(--line);border-radius:14px;padding:20px 20px 8px}
+  .know h3{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gochu);margin-bottom:14px}
+  .know ul{list-style:none}
+  .know li{display:flex;gap:11px;padding:0 0 14px;font-size:14px;color:var(--smoke)}
+  .know li b{color:var(--cream);font-weight:600}
+  .know li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:7px;flex-shrink:0}
+
+  footer{margin-top:40px;text-align:center;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+
+  /* ---------- MOTION ---------- */
+  .day,.hero>*{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+  .day:nth-of-type(1){animation-delay:.04s}
+  .day:nth-of-type(2){animation-delay:.08s}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .entry:hover .e-name{color:#fff}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  @media(max-width:520px){
+    .entry{grid-template-columns:64px 1fr;gap:13px}
+    .day-head{flex-direction:column;align-items:flex-start;gap:12px}
+    .ribbon{padding-bottom:0}
+    .burn{grid-template-columns:1fr}
+  }
+
+  @media print{
+    body{background:#fff;color:#1a1a1a;padding:0}
+    .hero,.day,.know,.card{border-color:#ddd}
+    h1,.day-title,.e-name,.extra h2,.card .ct{color:#111}
+    .tip,.day-tag,.thesis,.alt,.note,.card .cd,.know li{color:#444}
+    .card,.know,.note{background:#f7f7f5}
+    .map{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="kicker">July 2–5, 2026 <span>·</span> Duluth, GA <span>·</span> Atlanta's Koreatown</div>
+    <h1><span class="g- ">A Koreatown</span><em>Weekend</em></h1>
+    <div class="legend">
+      <span class="lg"><i class="dot d-feast"></i>Feast</span>
+      <span class="lg"><i class="dot d-move"></i>Move</span>
+      <span class="lg"><i class="dot d-reset"></i>Reset</span>
+      <span class="lg"><i class="dot d-event"></i>Event</span>
+      <span class="lg"><i class="dot d-stay"></i>Stay</span>
+    </div>
+  </header>
+
+  <!-- THURSDAY -->
+  <section class="day">
+    <div class="day-head">
+      <div>
+        <div class="day-eyebrow">Day 01 · Thu Jul 2</div>
+        <div class="day-title">Arrive &amp; feast</div>
+        <div class="day-tag">Late arrival — straight to the grill.</div>
+      </div>
+      <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--stay)"></i></div>
+    </div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time">9:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">9292 Korean BBQ</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.8★</b> · 9.5k · Duluth</span></div>
+          <div class="tip">Charcoal KBBQ, grilled tableside so you can just collapse after the drive from Charlotte. Open till <b>midnight</b>. The 9292 Special is plenty for the table.</div>
+          <a class="map" href="https://maps.google.com/?cid=10860745876193718875" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">11:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Hyatt · Duluth</span><span class="tag t-stay">Stay</span></div>
+          <div class="tip">Check in, lights out. Big day tomorrow.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRIDAY -->
+  <section class="day">
+    <div class="day-head">
+      <div>
+        <div class="day-eyebrow">Day 02 · Fri Jul 3</div>
+        <div class="day-title">Pickle &amp; gopchang</div>
+        <div class="day-tag">Earn it on the court, spend it on good eats and drinks.</div>
+      </div>
+      <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gold)"></i><i style="background:var(--gochu)"></i><i style="background:var(--stay)"></i><i style="background:var(--spark)"></i></div>
+    </div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time">9:30<small>AM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Simfull</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.7★</b> · 200 · Suwanee</span></div>
+          <div class="tip">Light, healthy pre-game fuel — widely called the <b>best gimbap in metro Atlanta</b>. Kimbap + porridge, opens 7 AM.</div>
+          <div class="alt">Prefer a sit-down brunch? <b>Cafe 104</b> (4.3★ · 471) or <b>The Cream</b> (4.6★ · 487) — both Korean-fusion, open 10.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Simfull+2855+Lawrenceville-Suwanee+Rd+Suwanee+GA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">12:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Pickle and Social</span><span class="tag t-move">Move</span><span class="rating"><b>4.5★</b> · 241 · Buford</span></div>
+          <div class="tip">Your pickleball block (~2.5 hrs after breakfast). Courts, food, drinks — the calorie burn of the day.</div>
+          <a class="map" href="https://maps.google.com/?cid=2194128098709176649" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">3:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Cafe Mixx</span><span class="tag t-reset">Reset</span><span class="rating"><b>4.5★</b> · 520 · Suwanee</span></div>
+          <div class="tip">Decompress after pickleball — coffee + a sweet treat at this Korean-Japanese cafe, right on the way back from Buford. Open till 10. Or just crash at the hotel.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Cafe+Mixx+Suwanee+GA&query_place_id=ChIJOU5ECECX9YgRSzntZ-25Sfk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Cafe Mixx</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">5:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">World Beverage</span><span class="tag t-event">Soju run</span><span class="rating"><b>4.5★</b> · 752 · Duluth</span></div>
+          <div class="tip">Swing by on the way back from Buford — reviewers call out the <b>widest soju &amp; sake selection</b> around. Grab a few bottles for the pregame. Open till 11 (Pleasant Hill Rd).</div>
+          <div class="alt">Closer to the plaza: <b>Gwinnett Package</b> (4.3★ · 788) — check the receipt, pricing runs high.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=World+Beverage+Duluth+GA&query_place_id=ChIJMWCXC22i9YgRiup-dlfP5go" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>World Beverage</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">6:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Pregame · Hyatt</span><span class="tag t-event">Pregame</span><span class="rating">BYO soju</span></div>
+          <div class="tip">Pour the soju, queue the playlist, get loose before gopchang. Dinner's close — roll out around 7:30.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">7:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Hwangso Gopchang</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.3★</b> · 456 · Duluth</span></div>
+          <div class="tip">The crowd favorite for gopchang — go for the <b>makchang &amp; daechang</b>. Open till 1 AM Fridays.</div>
+          <div class="alt">Connoisseur picks: <b>GOP CHANG ON FIRE</b> (4.5★ · 131, most "feels like Seoul") or <b>Gopchang Salon</b> (4.5★ · 187).</div>
+          <a class="map" href="https://maps.google.com/?cid=9669785786351906865" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry spark-host">
+        <div class="time">9:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Gang Nam Style Karaoke</span><span class="tag t-event">Event</span><span class="rating"><b>3.7★</b> · 113 · till 1 AM</span></div>
+          <div class="tip">Noraebang to close the night. <span class="flag">Confirm the room rate up front</span> — reviews flag surprise pricing. Backup: <b>Do Re Mi</b> (3.6★ · 325) by the H Mart.</div>
+          <a class="map" href="https://maps.google.com/?cid=13217485142161794059" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry" style="border-top:none;padding-top:6px">
+        <div class="note">
+          <span class="pin">The night</span>
+          <div><b>Soju run → pregame → gopchang → karaoke.</b> World Beverage and the Hyatt are on Pleasant Hill; gopchang and the noraebang sit in the same strip on N&nbsp;Berkeley Lake Rd — just a 5-min hop between the two.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SATURDAY -->
+  <section class="day">
+    <div class="day-head">
+      <div>
+        <div class="day-eyebrow">Day 03 · Sat Jul 4</div>
+        <div class="day-title">Independence</div>
+        <div class="day-tag">Soup, mall, games, omakase, fireworks.</div>
+      </div>
+      <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gold)"></i><i style="background:var(--gochu)"></i><i style="background:var(--spark)"></i></div>
+    </div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time">9:00<small>AM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Moo Bong Ri</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.5★</b> · 935 · Duluth</span></div>
+          <div class="tip">Your pick — the <b>soondae-guk</b> (blood-sausage soup) specialist. Opens 9 — go early to free up the morning for the mall.</div>
+          <a class="map" href="https://maps.google.com/?cid=2399712712681043821" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">10:30<small>AM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Mall of Georgia</span><span class="tag t-move">Move</span><span class="tag t-reset" style="opacity:.7">Optional</span><span class="rating"><b>4.5★</b> · 19.9k · Buford</span></div>
+          <div class="tip">The big one — Georgia's largest mall, two levels with a carousel and 200+ stores. Opens 10, ~20 min from the soup. Browse, rack up some steps, then double back for lunch.</div>
+          <div class="alt">Closer / less backtracking: <b>Sugarloaf Mills</b> (4.4★ · 16k) — huge outlet mall with Bass Pro, ~10 min away.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Mall+of+Georgia+Buford+GA&query_place_id=ChIJf04EMFuU9YgR4KKvOBkxfKE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mall of Georgia</a>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Sugarloaf+Mills+Lawrenceville+GA&query_place_id=ChIJvffBmj299YgRC8maXhvD68o" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Sugarloaf Mills</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">12:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Zoong Guk Zip</span><span class="tag t-feast">Feast</span><span class="tag t-reset" style="opacity:.7">Optional</span><span class="rating"><b>4.0★</b> · 595 · Duluth</span></div>
+          <div class="tip">Korean-Chinese graze before Activate — split <b>jjajangmyeon</b>, <b>jjamppong</b> &amp; crispy <b>tangsuyuk</b> for the table. Huge portions, friendly aunties. Keep it shared, not a full sit-down.</div>
+          <div class="alt">Worth-the-detour swap: <b>Phở Bắc</b> (4.5★ · 1.4k, Vietnamese) — an OG on Buford Hwy in Chamblee, ~25 min south. Best pho in the metro, per the regulars.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Zoong+Guk+Jib+Duluth+GA&query_place_id=ChIJCe950J2j9YgRRXYiOQVGCTg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Zoong Guk Zip</a>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Pho+Bac+Restaurant+Chamblee+GA&query_place_id=ChIJUWilWTQI9YgRca4_-5Px824" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Phở Bắc</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">2:20<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Activate Games</span><span class="tag t-move">Move</span><span class="rating"><b>4.9★</b> · 424 · Alpharetta</span></div>
+          <div class="tip">~1 hr of mind-and-body tech games — the Grid and Laser are favorites. ~25 min away.</div>
+          <a class="map" href="https://maps.google.com/?cid=15468370425270232327" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">4:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Coffee by Hand</span><span class="tag t-reset">Reset</span><span class="rating"><b>4.4★</b> · 869 · Duluth</span></div>
+          <div class="tip">Wind down after Activate — iced coffee + bingsu on the way back from Alpharetta. Open late.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=The+Coffee+By+Hand+Duluth+GA&query_place_id=ChIJy83g5wSj9YgR_7QRo2QKmLA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Coffee by Hand</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">5:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Nap &amp; reset</span><span class="tag t-reset">Reset</span><span class="rating">~1.5 hrs</span></div>
+          <div class="tip">Feet up at the hotel — a solid rest before the omakase. Big dinner, fireworks, and a late night still ahead.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">7:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Jak Omakase</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.7★</b> · 219 · Duluth</span></div>
+          <div class="tip">Exceptional-value omakase right in town — multi-course for well under in-town prices. <span class="flag">Reserve ahead — it's small.</span></div>
+          <div class="alt">Splurge / backup: <b>TSUKI Omakase</b>, Johns Creek (perfect 5.0★ · 41).</div>
+          <a class="map" href="https://maps.google.com/?cid=5379781075697255647" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry spark-host">
+        <div class="time">9:30<small>FIREWORKS</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Newtown Park · Johns Creek</span><span class="tag t-event">Event</span><span class="rating">Free · ~15 min</span></div>
+          <div class="tip">Free July 4th fireworks after dark (~9:30) — close enough to make it work <b>after</b> a 7 PM dinner.</div>
+          <div class="note" style="margin-top:11px">
+            <span class="pin">Trade-off</span>
+            <div><b>Stone Mountain's</b> drone + laser + fireworks (9:30) is the area's best — but on July 4 they want you there by <b>5 PM</b>, which collides with omakase. Do Stone Mountain only if you shift dinner earlier.</div>
+          </div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Newtown+Park+Johns+Creek+GA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUNDAY -->
+  <section class="day">
+    <div class="day-head">
+      <div>
+        <div class="day-eyebrow">Day 04 · Sun Jul 5</div>
+        <div class="day-title">Buford Hwy send-off</div>
+        <div class="day-tag">Pho, groceries, and one last cafe before home.</div>
+      </div>
+      <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gold)"></i><i style="background:var(--spark)"></i></div>
+    </div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time">10:00<small>AM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Phở Bắc</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.5★</b> · 1.4k · Chamblee</span></div>
+          <div class="tip">OG Buford Hwy pho — opens 10 AM, broth's been going since the morning. Order the rare beef + tendon + tripe. Perfect send-off bowl before the drive.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Pho+Bac+Restaurant+Chamblee+GA&query_place_id=ChIJUWilWTQI9YgRca4_-5Px824" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">11:30<small>AM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">H Mart · Doraville</span><span class="tag t-reset">Stock up</span><span class="rating"><b>4.5★</b> · 6.2k · Doraville</span></div>
+          <div class="tip">The super H Mart — 3x the size of most locations. Banchan, ramyun, frozen mandu, live fish, food court. Load up before hitting the highway.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=H+Mart+Doraville+GA&query_place_id=ChIJm1UhusEJ9YgRd3565oMYAak" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">12:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Chuchat Cafe</span><span class="tag t-reset">Reset</span><span class="rating"><b>4.8★</b> · 581 · Johns Creek</span></div>
+          <div class="tip">Last stop — Taiwanese-Korean cafe with bingsu, croffles, skewers, and drinks that aren't too sweet. Cozy privacy booths, great for a final debrief before the highway. Opens 11:30.</div>
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Chuchat+Cafe+Johns+Creek+GA&query_place_id=ChIJPR5SJL-f9YgRF4jcZyLZtrk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">1:30<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Home</span><span class="tag t-stay">Drive</span></div>
+          <div class="tip">Hit I-85 full of pho, banchan, and good decisions.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXTRA BURN -->
+  <section class="extra">
+    <h2>Extra burn</h2>
+    <p class="sub">Optional sessions to slot into a morning or a "reset" window — beat the July heat by going early.</p>
+    <div class="burn">
+      <div class="card">
+        <div class="ct"><span class="dot d-move" style="width:10px;height:10px"></span>McDaniel Farm Park</div>
+        <div class="cd">Paved trails minutes from the hotel — ideal early jog or walk. 4.8★ · 2.3k.</div>
+        <a class="map" href="https://maps.google.com/?cid=797152585697252970" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+      </div>
+      <div class="card">
+        <div class="ct"><span class="dot d-move" style="width:10px;height:10px"></span>Stone Mountain hike</div>
+        <div class="cd">Strenuous 1.2-mi climb to panoramic views. Gates open 5 AM — go early. 4.6★ · 42.9k.</div>
+        <a class="map" href="https://maps.google.com/?cid=8034969950713354332" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+      </div>
+      <div class="card">
+        <div class="ct"><span class="dot d-move" style="width:10px;height:10px"></span>Adrenaline Climbing</div>
+        <div class="cd">Bouldering + ropes in Suwanee, ~15 min. Good heat-of-day or rain option. 4.5★ · 294.</div>
+        <a class="map" href="https://www.google.com/maps/search/?api=1&query=Adrenaline+Climbing+460+Brogdon+Rd+Suwanee+GA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+      </div>
+      <div class="card">
+        <div class="ct"><span class="dot d-move" style="width:10px;height:10px"></span>Urban Air Buford</div>
+        <div class="cd">Trampoline park + ropes course + climbing walls — actual cardio, ~20 min by the Mall of Georgia. 4.2★ · 1.2k.</div>
+        <a class="map" href="https://www.google.com/maps/search/?api=1&query=Urban+Air+Trampoline+Park+Buford+GA&query_place_id=ChIJp2VfBsWV9YgRiGuvTozwWUk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+      </div>
+      <div class="card">
+        <div class="ct"><span class="dot d-move" style="width:10px;height:10px"></span>Topgolf Alpharetta</div>
+        <div class="cd">Hours of swings in climate-controlled bays — lighter burn, big group fun. Near Activate, opens 9 AM. 4.4★ · 3.8k.</div>
+        <a class="map" href="https://www.google.com/maps/search/?api=1&query=Topgolf+Alpharetta+GA&query_place_id=ChIJPxmYNx919YgRi9Oq0u19Q08" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+      </div>
+    </div>
+
+    <div class="know">
+      <h3>Good to know</h3>
+      <ul>
+        <li><div><b>Reserve now:</b> Jak Omakase (Sat 7 PM) seats just a handful — book ahead. Gopchang spots get a wait on Fri nights too.</div></li>
+        <li><div><b>Saturday is packed:</b> soup → mall → Korean-Chinese lunch → Activate is a lot before a 7 PM omakase. Going to Moo Bong Ri at 9 and keeping lunch a shared graze makes it fit; drop the mall or lunch if it feels rushed.</div></li>
+        <li><div><b>July 4 fireworks fork:</b> easy free show at Newtown Park after dinner, or the marquee Stone Mountain show if you move dinner earlier.</div></li>
+        <li><div><b>Heat:</b> Atlanta in July is hot &amp; humid — push hikes and outdoor walks to early morning.</div></li>
+        <li><div><b>Home base:</b> nearly every food stop is within ~15 min of Duluth; Activate, Stone Mountain &amp; the fireworks are the longer hops.</div></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Eat · Move · Reset · Repeat — 7/2–7/5</footer>
+</div>
+</body>
+</html>
