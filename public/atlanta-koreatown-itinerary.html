@@ -65,8 +65,36 @@
   .d-reset{background:var(--gold)} .d-event{background:var(--spark)}
   .d-stay{background:var(--stay)}
 
+  /* ---------- DAY TABS ---------- */
+  .day-tabs{
+    display:flex;gap:8px;margin:26px 0 0;overflow-x:auto;
+    -ms-overflow-style:none;scrollbar-width:none;
+  }
+  .day-tabs::-webkit-scrollbar{display:none}
+  .day-tab{
+    flex:1 0 auto;min-width:76px;background:var(--ash);border:1px solid var(--line);
+    border-radius:14px;padding:12px 10px;text-align:center;cursor:pointer;
+    font-family:"Space Mono",monospace;transition:background .18s,border-color .18s,box-shadow .18s;
+  }
+  .day-tab .dt-name{display:block;font-size:12px;letter-spacing:.12em;color:var(--smoke);text-transform:uppercase;margin-bottom:4px}
+  .day-tab .dt-date{display:block;font-size:12.5px;color:var(--faint)}
+  .day-tab:hover:not(.active){border-color:var(--smoke)}
+  .day-tab.active{background:var(--jade);border-color:var(--jade);box-shadow:0 4px 20px rgba(95,166,134,.35)}
+  .day-tab.active .dt-name{color:#0f1a14}
+  .day-tab.active .dt-date{color:rgba(15,26,20,.7)}
+
+  /* ---------- WEATHER ---------- */
+  .weather{
+    display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:8px 14px;
+    background:var(--ember);border:1px solid var(--line);border-radius:999px;
+    font-family:"Space Mono",monospace;font-size:12.5px;color:var(--smoke);letter-spacing:.02em;
+  }
+  .weather .w-ico{font-size:14px;line-height:1}
+  .weather .w-temp{color:var(--cream);font-weight:700}
+
   /* ---------- DAY ---------- */
-  .day{padding:38px 0 6px;border-bottom:1px solid var(--line)}
+  .day{display:none;padding:32px 0 6px;border-bottom:1px solid var(--line)}
+  .day.active{display:block;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
   .day-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:4px}
   .day-eyebrow{
     font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;
@@ -158,9 +186,7 @@
   footer{margin-top:40px;text-align:center;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 
   /* ---------- MOTION ---------- */
-  .day,.hero>*{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
-  .day:nth-of-type(1){animation-delay:.04s}
-  .day:nth-of-type(2){animation-delay:.08s}
+  .hero>*{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   .entry:hover .e-name{color:#fff}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -170,6 +196,7 @@
     .day-head{flex-direction:column;align-items:flex-start;gap:12px}
     .ribbon{padding-bottom:0}
     .burn{grid-template-columns:1fr}
+    .day-tab{min-width:64px;padding:10px 6px}
   }
 
   @media print{
@@ -177,8 +204,10 @@
     .hero,.day,.know,.card{border-color:#ddd}
     h1,.day-title,.e-name,.extra h2,.card .ct{color:#111}
     .tip,.day-tag,.thesis,.alt,.note,.card .cd,.know li{color:#444}
-    .card,.know,.note{background:#f7f7f5}
+    .card,.know,.note,.weather{background:#f7f7f5}
     .map{display:none}
+    .day-tabs{display:none}
+    .day{display:block!important}
   }
 </style>
 </head>
@@ -198,13 +227,22 @@
     </div>
   </header>
 
+  <!-- DAY TABS -->
+  <nav class="day-tabs" role="tablist" aria-label="Trip days">
+    <button class="day-tab active" role="tab" aria-selected="true" data-day="1"><span class="dt-name">Thu</span><span class="dt-date">Jul 2</span></button>
+    <button class="day-tab" role="tab" aria-selected="false" data-day="2"><span class="dt-name">Fri</span><span class="dt-date">Jul 3</span></button>
+    <button class="day-tab" role="tab" aria-selected="false" data-day="3"><span class="dt-name">Sat</span><span class="dt-date">Jul 4</span></button>
+    <button class="day-tab" role="tab" aria-selected="false" data-day="4"><span class="dt-name">Sun</span><span class="dt-date">Jul 5</span></button>
+  </nav>
+
   <!-- THURSDAY -->
-  <section class="day">
+  <section class="day active" id="day-1" data-day="1">
     <div class="day-head">
       <div>
         <div class="day-eyebrow">Day 01 · Thu Jul 2</div>
         <div class="day-title">Arrive &amp; feast</div>
         <div class="day-tag">Late arrival — straight to the grill.</div>
+        <div class="weather"><span class="w-ico">🌤️</span><span class="w-temp">90°</span> / 71° · Sunny, isolated PM storm</div>
       </div>
       <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--stay)"></i></div>
     </div>
@@ -228,12 +266,13 @@
   </section>
 
   <!-- FRIDAY -->
-  <section class="day">
+  <section class="day" id="day-2" data-day="2">
     <div class="day-head">
       <div>
         <div class="day-eyebrow">Day 02 · Fri Jul 3</div>
-        <div class="day-title">Pickle &amp; gopchang</div>
+        <div class="day-title">Pickle &amp; omakase</div>
         <div class="day-tag">Earn it on the court, spend it on good eats and drinks.</div>
+        <div class="weather"><span class="w-ico">🌤️</span><span class="w-temp">91°</span> / 72° · Sunny, PM storm chance</div>
       </div>
       <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gold)"></i><i style="background:var(--gochu)"></i><i style="background:var(--stay)"></i><i style="background:var(--spark)"></i></div>
     </div>
@@ -248,7 +287,7 @@
         </div>
       </div>
       <div class="entry">
-        <div class="time">12:30<small>PM</small></div>
+        <div class="time">12:20<small>PM</small></div>
         <div>
           <div class="e-head"><span class="e-name">Pickle and Social</span><span class="tag t-move">Move</span><span class="rating"><b>4.5★</b> · 241 · Buford</span></div>
           <div class="tip">Your pickleball block (~2.5 hrs after breakfast). Courts, food, drinks — the calorie burn of the day.</div>
@@ -259,12 +298,12 @@
         <div class="time">3:30<small>PM</small></div>
         <div>
           <div class="e-head"><span class="e-name">Cafe Mixx</span><span class="tag t-reset">Reset</span><span class="rating"><b>4.5★</b> · 520 · Suwanee</span></div>
-          <div class="tip">Decompress after pickleball — coffee + a sweet treat at this Korean-Japanese cafe, right on the way back from Buford. Open till 10. Or just crash at the hotel.</div>
+          <div class="tip">Decompress after pickleball — coffee + a sweet treat at this Korean-Japanese cafe, right on the way back from Buford. Open till 10.</div>
           <a class="map" href="https://www.google.com/maps/search/?api=1&query=Cafe+Mixx+Suwanee+GA&query_place_id=ChIJOU5ECECX9YgRSzntZ-25Sfk" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Cafe Mixx</a>
         </div>
       </div>
       <div class="entry">
-        <div class="time">5:30<small>PM</small></div>
+        <div class="time">4:30<small>PM</small></div>
         <div>
           <div class="e-head"><span class="e-name">World Beverage</span><span class="tag t-event">Soju run</span><span class="rating"><b>4.5★</b> · 752 · Duluth</span></div>
           <div class="tip">Swing by on the way back from Buford — reviewers call out the <b>widest soju &amp; sake selection</b> around. Grab a few bottles for the pregame. Open till 11 (Pleasant Hill Rd).</div>
@@ -273,19 +312,26 @@
         </div>
       </div>
       <div class="entry">
-        <div class="time">6:00<small>PM</small></div>
+        <div class="time">5:15<small>PM</small></div>
         <div>
-          <div class="e-head"><span class="e-name">Pregame · Hyatt</span><span class="tag t-event">Pregame</span><span class="rating">BYO soju</span></div>
-          <div class="tip">Pour the soju, queue the playlist, get loose before gopchang. Dinner's close — roll out around 7:30.</div>
+          <div class="e-head"><span class="e-name">Nap &amp; refresh</span><span class="tag t-reset">Reset</span><span class="rating">~45 min</span></div>
+          <div class="tip">Feet up at the hotel after grabbing the soju — recharge before pregame and omakase tonight.</div>
         </div>
       </div>
       <div class="entry">
-        <div class="time">7:30<small>PM</small></div>
+        <div class="time">6:00<small>PM</small></div>
         <div>
-          <div class="e-head"><span class="e-name">Hwangso Gopchang</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.3★</b> · 456 · Duluth</span></div>
-          <div class="tip">The crowd favorite for gopchang — go for the <b>makchang &amp; daechang</b>. Open till 1 AM Fridays.</div>
-          <div class="alt">Connoisseur picks: <b>GOP CHANG ON FIRE</b> (4.5★ · 131, most "feels like Seoul") or <b>Gopchang Salon</b> (4.5★ · 187).</div>
-          <a class="map" href="https://maps.google.com/?cid=9669785786351906865" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+          <div class="e-head"><span class="e-name">Pregame · Hyatt</span><span class="tag t-event">Pregame</span><span class="rating">BYO soju</span></div>
+          <div class="tip">Pour the soju, queue the playlist, get loose before dinner. Omakase's reserved for 7:00 — roll out by 6:45.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <div class="time">7:00<small>PM</small></div>
+        <div>
+          <div class="e-head"><span class="e-name">Jak Omakase</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.7★</b> · 219 · Duluth</span></div>
+          <div class="tip">Exceptional-value omakase right in town — multi-course for well under in-town prices. <span class="flag">Reserve ahead — it's small.</span></div>
+          <div class="alt">Splurge / backup: <b>TSUKI Omakase</b>, Johns Creek (perfect 5.0★ · 41).</div>
+          <a class="map" href="https://maps.google.com/?cid=5379781075697255647" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
         </div>
       </div>
       <div class="entry spark-host">
@@ -299,19 +345,20 @@
       <div class="entry" style="border-top:none;padding-top:6px">
         <div class="note">
           <span class="pin">The night</span>
-          <div><b>Soju run → pregame → gopchang → karaoke.</b> World Beverage and the Hyatt are on Pleasant Hill; gopchang and the noraebang sit in the same strip on N&nbsp;Berkeley Lake Rd — just a 5-min hop between the two.</div>
+          <div><b>Soju run → pregame → omakase → karaoke.</b> World Beverage and the Hyatt are on Pleasant Hill Rd; the noraebang is a quick hop from dinner, just a few minutes across town.</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- SATURDAY -->
-  <section class="day">
+  <section class="day" id="day-3" data-day="3">
     <div class="day-head">
       <div>
         <div class="day-eyebrow">Day 03 · Sat Jul 4</div>
         <div class="day-title">Independence</div>
-        <div class="day-tag">Soup, mall, games, omakase, fireworks.</div>
+        <div class="day-tag">Soup, mall, games, gopchang, fireworks.</div>
+        <div class="weather"><span class="w-ico">⛅</span><span class="w-temp">92°</span> / 73° · Hot &amp; humid, PM storms possible</div>
       </div>
       <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gold)"></i><i style="background:var(--gochu)"></i><i style="background:var(--spark)"></i></div>
     </div>
@@ -364,16 +411,16 @@
         <div class="time">5:00<small>PM</small></div>
         <div>
           <div class="e-head"><span class="e-name">Nap &amp; reset</span><span class="tag t-reset">Reset</span><span class="rating">~1.5 hrs</span></div>
-          <div class="tip">Feet up at the hotel — a solid rest before the omakase. Big dinner, fireworks, and a late night still ahead.</div>
+          <div class="tip">Feet up at the hotel — a solid rest before the gopchang. Big dinner, fireworks, and a late night still ahead.</div>
         </div>
       </div>
       <div class="entry">
         <div class="time">7:00<small>PM</small></div>
         <div>
-          <div class="e-head"><span class="e-name">Jak Omakase</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.7★</b> · 219 · Duluth</span></div>
-          <div class="tip">Exceptional-value omakase right in town — multi-course for well under in-town prices. <span class="flag">Reserve ahead — it's small.</span></div>
-          <div class="alt">Splurge / backup: <b>TSUKI Omakase</b>, Johns Creek (perfect 5.0★ · 41).</div>
-          <a class="map" href="https://maps.google.com/?cid=5379781075697255647" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
+          <div class="e-head"><span class="e-name">Hwangso Gopchang</span><span class="tag t-feast">Feast</span><span class="rating"><b>4.3★</b> · 456 · Duluth</span></div>
+          <div class="tip">The crowd favorite for gopchang — go for the <b>makchang &amp; daechang</b>. Open till 1 AM Saturdays.</div>
+          <div class="alt">Connoisseur picks: <b>GOP CHANG ON FIRE</b> (4.5★ · 131, most "feels like Seoul") or <b>Gopchang Salon</b> (4.5★ · 187).</div>
+          <a class="map" href="https://maps.google.com/?cid=9669785786351906865" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
         </div>
       </div>
       <div class="entry spark-host">
@@ -383,7 +430,7 @@
           <div class="tip">Free July 4th fireworks after dark (~9:30) — close enough to make it work <b>after</b> a 7 PM dinner.</div>
           <div class="note" style="margin-top:11px">
             <span class="pin">Trade-off</span>
-            <div><b>Stone Mountain's</b> drone + laser + fireworks (9:30) is the area's best — but on July 4 they want you there by <b>5 PM</b>, which collides with omakase. Do Stone Mountain only if you shift dinner earlier.</div>
+            <div><b>Stone Mountain's</b> drone + laser + fireworks (9:30) is the area's best — but on July 4 they want you there by <b>5 PM</b>, which collides with dinner. Do Stone Mountain only if you shift dinner earlier.</div>
           </div>
           <a class="map" href="https://www.google.com/maps/search/?api=1&query=Newtown+Park+Johns+Creek+GA" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</a>
         </div>
@@ -392,12 +439,13 @@
   </section>
 
   <!-- SUNDAY -->
-  <section class="day">
+  <section class="day" id="day-4" data-day="4">
     <div class="day-head">
       <div>
         <div class="day-eyebrow">Day 04 · Sun Jul 5</div>
         <div class="day-title">Buford Hwy send-off</div>
         <div class="day-tag">Pho, groceries, and one last cafe before home.</div>
+        <div class="weather"><span class="w-ico">⛅</span><span class="w-temp">89°</span> / 70° · Partly cloudy, low storm chance</div>
       </div>
       <div class="ribbon"><i style="background:var(--gochu)"></i><i style="background:var(--jade)"></i><i style="background:var(--gold)"></i><i style="background:var(--spark)"></i></div>
     </div>
@@ -471,10 +519,11 @@
     <div class="know">
       <h3>Good to know</h3>
       <ul>
-        <li><div><b>Reserve now:</b> Jak Omakase (Sat 7 PM) seats just a handful — book ahead. Gopchang spots get a wait on Fri nights too.</div></li>
-        <li><div><b>Saturday is packed:</b> soup → mall → Korean-Chinese lunch → Activate is a lot before a 7 PM omakase. Going to Moo Bong Ri at 9 and keeping lunch a shared graze makes it fit; drop the mall or lunch if it feels rushed.</div></li>
+        <li><div><b>Reserve now:</b> Jak Omakase (Fri 7:30 PM) seats just a handful — book ahead. Gopchang spots get a wait on Sat nights too.</div></li>
+        <li><div><b>Saturday is packed:</b> soup → mall → Korean-Chinese lunch → Activate is a lot before a 7 PM gopchang dinner. Going to Moo Bong Ri at 9 and keeping lunch a shared graze makes it fit; drop the mall or lunch if it feels rushed.</div></li>
         <li><div><b>July 4 fireworks fork:</b> easy free show at Newtown Park after dinner, or the marquee Stone Mountain show if you move dinner earlier.</div></li>
         <li><div><b>Heat:</b> Atlanta in July is hot &amp; humid — push hikes and outdoor walks to early morning.</div></li>
+        <li><div><b>Weather:</b> shown highs/lows are typical for early July — forecasts this far out shift, so check again the week of.</div></li>
         <li><div><b>Home base:</b> nearly every food stop is within ~15 min of Duluth; Activate, Stone Mountain &amp; the fireworks are the longer hops.</div></li>
       </ul>
     </div>
@@ -482,5 +531,26 @@
 
   <footer>Eat · Move · Reset · Repeat — 7/2–7/5</footer>
 </div>
+
+<script>
+  (function(){
+    var tabs = document.querySelectorAll('.day-tab');
+    var days = document.querySelectorAll('.day');
+    tabs.forEach(function(tab){
+      tab.addEventListener('click', function(){
+        var target = tab.getAttribute('data-day');
+        tabs.forEach(function(t){
+          t.classList.remove('active');
+          t.setAttribute('aria-selected','false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected','true');
+        days.forEach(function(d){
+          d.classList.toggle('active', d.getAttribute('data-day') === target);
+        });
+      });
+    });
+  })();
+</script>
 </body>
 </html>
