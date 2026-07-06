@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Routine · Phases · AM / PM</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Skin Routine">
+<meta name="theme-color" content="#F6F7F3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#7C9473; --sage-soft:#EAF0E6; --sage-deep:#5C7355;
+    --slate:#5A6B85; --slate-soft:#E7EBF2; --slate-deep:#3D4A61;
+    --ink:#3A4238; --paper:#F6F7F3; --card:#FFFFFF;
+    --line:#E3E7DE; --muted:#8A927F;
+    --accent:var(--sage); --accent-soft:var(--sage-soft); --accent-deep:var(--sage-deep);
+    --radius:18px;
+  }
+  [data-mode="pm"]{
+    --ink:#333A47; --paper:#F2F4F7; --line:#DDE2EA; --muted:#818B9C;
+    --accent:var(--slate); --accent-soft:var(--slate-soft); --accent-deep:var(--slate-deep);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--paper);}
+  body{
+    font-family:'Karla',sans-serif; color:var(--ink);
+    min-height:100vh; padding:20px 14px 60px;
+    transition:background .5s ease;
+  }
+  .wrap{max-width:540px; margin:0 auto;}
+
+  header{text-align:center; margin-bottom:14px;}
+  .today-date{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); font-weight:700;}
+  h1{font-family:'Fraunces',serif; font-weight:600; font-size:29px; margin-top:5px;}
+  .sub{font-size:13px; color:var(--muted); margin-top:5px;}
+  .save-status{
+    display:inline-flex; align-items:center; gap:5px; margin-top:9px;
+    font-size:11px; font-weight:700; color:var(--muted);
+    opacity:0; transition:opacity .4s ease;
+  }
+  .save-status.show{opacity:1;}
+  .save-status .sdot{width:6px; height:6px; border-radius:50%; background:var(--accent);}
+  .save-status.warn .sdot{background:#C97B4A;}
+  .save-status.warn{color:#C97B4A;}
+
+  /* phase picker */
+  .phases{display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin:16px 0 6px;}
+  .phase{
+    background:var(--card); border:1.5px solid var(--line); border-radius:14px;
+    padding:9px 6px 8px; text-align:center; cursor:pointer; transition:all .25s ease;
+  }
+  .phase .p-num{font-family:'Fraunces',serif; font-size:16px; font-weight:600; color:var(--muted);}
+  .phase .p-name{font-size:10.5px; font-weight:700; color:var(--muted); margin-top:2px; line-height:1.25;}
+  .phase.active{border-color:var(--accent); background:var(--accent-soft);}
+  .phase.active .p-num,.phase.active .p-name{color:var(--accent-deep);}
+  .phase-desc{font-size:12px; color:var(--muted); text-align:center; margin:8px 4px 14px; line-height:1.5;}
+
+  .mode-toggle{
+    display:flex; background:var(--card); border:1px solid var(--line);
+    border-radius:999px; padding:4px; margin:0 auto 14px; width:230px;
+    box-shadow:0 2px 10px rgba(60,70,60,.06);
+  }
+  .mode-toggle button{
+    flex:1; border:none; background:transparent; border-radius:999px;
+    padding:9px 0; font-family:'Karla',sans-serif; font-weight:700; font-size:14px;
+    color:var(--muted); cursor:pointer; transition:all .3s ease;
+  }
+  .mode-toggle button.active{background:var(--accent); color:#fff;}
+
+  /* today banner */
+  .banner{
+    background:var(--accent); color:#fff; border-radius:var(--radius);
+    padding:14px 16px; margin-bottom:12px; text-align:center;
+  }
+  .banner .b-main{font-family:'Fraunces',serif; font-size:17.5px; font-weight:600;}
+  .banner .b-sub{font-size:12.5px; opacity:.92; margin-top:3px;}
+
+  /* week strip */
+  .week{
+    display:flex; justify-content:space-between; gap:5px;
+    background:var(--card); border:1.5px solid var(--line); border-radius:14px;
+    padding:10px 10px 9px; margin-bottom:14px;
+  }
+  .day{flex:1; text-align:center;}
+  .day .d-lbl{font-size:9.5px; font-weight:700; letter-spacing:.08em; color:var(--muted);}
+  .day .d-dot{
+    margin:5px auto 0; width:26px; height:26px; border-radius:50%;
+    display:grid; place-items:center; font-size:11px; font-weight:700;
+    background:var(--paper); color:var(--muted); border:1.5px solid var(--line);
+  }
+  .day.is-active .d-dot{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .day.is-today .d-lbl{color:var(--accent-deep);}
+  .day.is-today .d-dot{box-shadow:0 0 0 2.5px var(--accent-soft), 0 0 0 4px var(--accent);}
+  .week-caption{font-size:11px; color:var(--muted); text-align:center; margin:-8px 0 14px;}
+
+  /* settings + option chips */
+  .options{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12.5px; font-weight:600; color:var(--accent-deep);
+    background:var(--accent-soft); border:1px solid transparent;
+    border-radius:999px; padding:7px 13px; cursor:pointer; user-select:none;
+    transition:all .25s ease; font-family:'Karla',sans-serif;
+  }
+  .chip[aria-pressed="false"]{background:var(--card); color:var(--muted); border-color:var(--line);}
+  .chip .dot{width:8px; height:8px; border-radius:50%; background:var(--accent);}
+  .chip[aria-pressed="false"] .dot{background:var(--line);}
+  .freq{
+    display:inline-flex; align-items:center; gap:6px; background:var(--card);
+    border:1px solid var(--line); border-radius:999px; padding:4px 6px 4px 12px;
+    font-size:12px; font-weight:700; color:var(--muted);
+  }
+  .freq select{
+    border:none; background:var(--accent-soft); color:var(--accent-deep);
+    font-family:'Karla',sans-serif; font-weight:700; font-size:12px;
+    border-radius:999px; padding:4px 6px; cursor:pointer;
+  }
+
+  .progress{height:6px; border-radius:999px; background:var(--line); overflow:hidden; margin-bottom:18px;}
+  .progress > div{height:100%; width:0%; background:var(--accent); border-radius:999px; transition:width .4s ease;}
+
+  .step{
+    background:var(--card); border:1.5px solid var(--line);
+    border-radius:var(--radius); padding:16px 16px 16px 14px;
+    margin-bottom:12px; display:flex; gap:12px; align-items:flex-start;
+    transition:all .3s ease;
+  }
+  .step.next-up{border-color:var(--accent); box-shadow:0 4px 16px rgba(90,107,90,.12);}
+  .step.done{opacity:.55;}
+  .step.ready-pulse{animation:pulse 1.2s ease 2;}
+  @keyframes pulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.015);}}
+  @media (prefers-reduced-motion: reduce){
+    .step.ready-pulse{animation:none;} *{transition:none !important;}
+  }
+
+  .check{
+    flex-shrink:0; width:26px; height:26px; margin-top:2px;
+    border:2px solid var(--accent); border-radius:9px; background:transparent;
+    cursor:pointer; display:grid; place-items:center; transition:background .25s ease;
+  }
+  .check svg{opacity:0; transform:scale(.5); transition:all .2s ease;}
+  .step.done .check{background:var(--accent);}
+  .step.done .check svg{opacity:1; transform:scale(1);}
+
+  .body{flex:1; min-width:0;}
+  .step-label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--accent-deep);}
+  .step-title{font-family:'Fraunces',serif; font-weight:600; font-size:17.5px; margin:3px 0 5px;}
+  .step.done .step-title{text-decoration:line-through; text-decoration-thickness:1.5px; text-decoration-color:var(--accent);}
+  .step-how{font-size:13.5px; line-height:1.5; opacity:.85;}
+  .step-note{font-size:12px; color:var(--muted); margin-top:5px; font-style:italic;}
+  .wait-tag{
+    display:inline-flex; align-items:center; gap:5px; margin-top:9px;
+    font-size:12px; font-weight:700; color:var(--accent-deep);
+    background:var(--accent-soft); border-radius:999px; padding:5px 11px;
+  }
+
+  .timer{
+    margin-top:10px; display:none; align-items:center; gap:12px;
+    background:var(--accent-soft); border-radius:14px; padding:10px 12px;
+  }
+  .timer.running{display:flex;}
+  .ring{width:44px; height:44px; flex-shrink:0;}
+  .ring circle{fill:none; stroke-width:4;}
+  .ring .track{stroke:rgba(0,0,0,.08);}
+  .ring .arc{stroke:var(--accent); stroke-linecap:round; transform:rotate(-90deg); transform-origin:center; transition:stroke-dashoffset 1s linear;}
+  .timer .t-num{font-family:'Fraunces',serif; font-size:20px; font-weight:600; color:var(--accent-deep);}
+  .timer .t-lbl{font-size:11.5px; color:var(--muted); font-weight:600;}
+  .timer .skip{
+    margin-left:auto; border:none; background:transparent; color:var(--accent-deep);
+    font-family:'Karla',sans-serif; font-size:12px; font-weight:700; cursor:pointer;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .timer.finished{background:var(--accent);}
+  .timer.finished .t-num,.timer.finished .t-lbl{color:#fff;}
+
+  .alldone{
+    display:none; text-align:center; background:var(--card);
+    border:1.5px solid var(--accent); border-radius:var(--radius);
+    padding:26px 18px; margin-top:6px;
+  }
+  .alldone.show{display:block;}
+  .alldone .big{font-family:'Fraunces',serif; font-size:22px; font-weight:600; color:var(--accent-deep);}
+  .alldone p{font-size:13px; color:var(--muted); margin-top:6px;}
+
+  .phase-note{
+    background:var(--accent-soft); border-radius:14px; padding:12px 14px;
+    font-size:12.5px; color:var(--accent-deep); line-height:1.55; margin-top:16px;
+  }
+  .phase-note b{font-weight:700;}
+
+  .reset{
+    display:block; margin:20px auto 0; border:1.5px solid var(--line);
+    background:var(--card); color:var(--muted); font-family:'Karla',sans-serif;
+    font-weight:700; font-size:13px; border-radius:999px; padding:10px 22px; cursor:pointer;
+    transition:all .25s ease;
+  }
+  .reset:hover{border-color:var(--accent); color:var(--accent-deep);}
+  button:focus-visible,.chip:focus-visible,.phase:focus-visible,.check:focus-visible{outline:2.5px solid var(--accent-deep); outline-offset:2px;}
+</style>
+</head>
+<body data-mode="am">
+<div class="wrap">
+  <header>
+    <div class="today-date" id="dateLine"></div>
+    <h1 id="modeTitle"></h1>
+    <div class="sub" id="modeSub"></div>
+    <div class="save-status" id="saveStatus"><span class="sdot"></span><span id="saveStatusText">Saved to this device</span></div>
+  </header>
+
+  <div class="phases" id="phasePicker" role="tablist" aria-label="Routine phase"></div>
+  <div class="phase-desc" id="phaseDesc"></div>
+
+  <div class="mode-toggle" role="tablist" aria-label="Time of day">
+    <button id="amBtn" role="tab">☀️ AM</button>
+    <button id="pmBtn" role="tab">🌙 PM</button>
+  </div>
+
+  <div class="banner" id="banner"></div>
+  <div class="week" id="week"></div>
+  <div class="week-caption" id="weekCaption"></div>
+
+  <div class="options" id="options"></div>
+  <div class="progress"><div id="bar"></div></div>
+  <div id="steps"></div>
+
+  <div class="alldone" id="allDone">
+    <div class="big" id="doneMsg"></div>
+    <p id="doneSub"></p>
+  </div>
+
+  <div class="phase-note" id="phaseNote"></div>
+  <button class="reset" id="resetBtn">Reset today's checks</button>
+</div>
+
+<script>
+// localStorage-backed shim so progress persists in a normal browser
+window.storage = {
+  get: (k) => { const v = localStorage.getItem(k); return Promise.resolve(v === null ? null : {value: v}); },
+  set: (k, v) => { localStorage.setItem(k, v); return Promise.resolve(); }
+};
+</script>
+<script>
+(function(){
+  // ================= config =================
+  const DAY_NAMES = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  const VITC_DAYS = {"3x":[1,3,5], "daily":[0,1,2,3,4,5,6]};
+  const RET_DAYS  = {"2x":[1,4], "3x":[1,3,5], "4x":[0,1,3,5]};
+
+  const PHASES = {
+    1:{name:"Barrier Reset", desc:"Weeks 0–8 · Keep it boring & identical every day. Azelaic AM + PM, no new actives. Goal: zero reactions for 8 straight weeks.",
+       note:"<b>Phase 1 rule:</b> resist adding anything. Swap the toothpaste, lock in azelaic refills, let the barrier get bored & strong. Move to Phase 2 only after ~8 calm weeks."},
+    2:{name:"+ Vitamin C", desc:"Weeks 8–14 · Add vitamin C on set mornings (3×/week), move to daily once tolerated. Everything else stays the same.",
+       note:"<b>Phase 2 rule:</b> patch-test on the jawline for 3 days first. Start 3 mornings/week — switch the selector to Daily only after 2–3 weeks with zero irritation."},
+    3:{name:"+ Retinoid", desc:"Month 4+ · Retinoid on set nights (start 2×/week), azelaic on all other nights. Only begin if PD has been fully quiet.",
+       note:"<b>Phase 3 rules:</b> pea-sized only · sandwich between moisturizer layers · avoid mouth corners & nose folds entirely at first · never azelaic + retinoid the same night · add one night every 2–3 weeks only if calm. Any PD tingle around the mouth → drop back a phase for 2 weeks."},
+    4:{name:"Tretinoin Era", desc:"Month 6+ · Derm-approved tretinoin 0.025% replaces the starter retinoid. Same night rules, same sandwich, same patience.",
+       note:"<b>Phase 4 rules:</b> get the tret script from your derm — don't self-source. Keep the sandwich method forever. Planning microneedling? Pause tret 5 days before & after each session, and only book once PD has been silent 3+ months."}
+  };
+
+  // ================= state =================
+  let mode = new Date().getHours() >= 16 ? "pm" : "am";
+  let settings = {phase:1, vitcFreq:"3x", retFreq:"2x", opts:{makeup:true, metro:false, milk:false}};
+  let done = {}; // stepId -> true, per mode: keys like "am:rinse"
+  let timer = null, tick = null;
+  const todayKey = new Date().toDateString();
+
+  // ---- optional persistence (works when opened as a live Claude artifact) ----
+  const hasStore = typeof window !== "undefined" && window.storage && typeof window.storage.get === "function";
+  let storeConfirmedWorking = false;
+
+  function flashSaveStatus(ok, text){
+    const el = document.getElementById("saveStatus");
+    const txt = document.getElementById("saveStatusText");
+    if(!el || !txt) return;
+    txt.textContent = text;
+    el.classList.toggle("warn", !ok);
+    el.classList.add("show");
+  }
+
+  async function loadSaved(){
+    if(!hasStore){
+      flashSaveStatus(false, "Not saving — open this from the Claude app to keep progress");
+      return;
+    }
+    try{
+      const s = await window.storage.get("skincare-settings");
+      if(s && s.value){ const v = JSON.parse(s.value); settings = Object.assign(settings, v); settings.opts = Object.assign({makeup:true,metro:false,milk:false}, v.opts||{}); }
+      storeConfirmedWorking = true;
+    }catch(e){ /* key just doesn't exist yet on first-ever open — that's fine */ storeConfirmedWorking = true; }
+    try{
+      const d = await window.storage.get("skincare-daily");
+      if(d && d.value){ const v = JSON.parse(d.value); if(v.date === todayKey) done = v.done || {}; }
+    }catch(e){}
+    flashSaveStatus(true, storeConfirmedWorking ? "Settings & today's progress loaded" : "Saved to this device");
+    setTimeout(()=>{ const el=document.getElementById("saveStatus"); if(el) el.classList.remove("show"); }, 3500);
+  }
+
+  function saveSettings(){
+    if(!hasStore){ flashSaveStatus(false, "Not saved — reopen from the Claude app"); return; }
+    window.storage.set("skincare-settings", JSON.stringify(settings))
+      .then(()=>{ flashSaveStatus(true, "Saved"); setTimeout(()=>{ const el=document.getElementById("saveStatus"); if(el) el.classList.remove("show"); }, 1400); })
+      .catch(()=> flashSaveStatus(false, "Couldn't save — check your connection"));
+  }
+  function saveDaily(){
+    if(!hasStore) return;
+    window.storage.set("skincare-daily", JSON.stringify({date:todayKey, done})).catch(()=>{});
+  }
+
+  // ================= schedule logic =================
+  function todayInfo(){
+    const dow = new Date().getDay();
+    const vitCToday = settings.phase >= 2 && VITC_DAYS[settings.vitcFreq].includes(dow);
+    const retTonight = settings.phase >= 3 && RET_DAYS[settings.retFreq].includes(dow);
+    return {dow, vitCToday, retTonight};
+  }
+
+  // ================= steps =================
+  function buildSteps(){
+    const {vitCToday, retTonight} = todayInfo();
+    const o = settings.opts;
+    if(mode === "am"){
+      const s = [
+        {id:"rinse", t:"Water rinse", how:"Splash lukewarm water, pat dry with a clean towel. No cleanser needed.", note:"Fully dry before the next step — brush teeth while you wait (rinse toothpaste off your mouth corners!).", wait:240, waitLbl:"until fully dry"}
+      ];
+      if(settings.phase >= 2 && vitCToday)
+        s.push({id:"vitc", t:"Vitamin C serum", how:"3–4 drops spread over the whole face. Avoid the eyelids.", note:"", wait:150, waitLbl:"to absorb"});
+      s.push(
+        {id:"aza-am", t:"Azelaic acid 15%", how:"Pea-to-almond size total. Dot on forehead, cheeks, chin, nose — spread thin & even, into the nose folds, around (not on) the lips.", note:"Brief tingle = normal. Skin must be dry or it stings more.", wait:300, waitLbl:"to sink in"},
+        {id:"moist-am", t:"Toleriane Double Repair", how:"Nickel-sized amount. Press in, don't rub. Whisper-thin layer on chin, mouth corners & nose folds.", note:"", wait:240, waitLbl:"before SPF"},
+        {id:"spf", t:"SKIN1004 sunscreen", how:"Full two-finger amount — a line down index + middle finger. Face, hairline, ears, neck.", note:"Be generous — SPF is your brightening treatment too.", wait:420, waitLbl:"before makeup"}
+      );
+      return s;
+    }
+    // PM
+    const s = [];
+    if(o.makeup) s.push({id:"cleanse1", t:"First cleanse · Toleriane Dermo", how:"2–3 pumps on a DRY face with dry hands. Massage a full 60 seconds — longest where makeup is heaviest. Rinse lukewarm.", note:"The massage time is what dissolves the makeup — don't rush it.", wait:0});
+    s.push({id:"cleanse2", t:(o.makeup?"Second cleanse · Vanicream":"Cleanse · Vanicream"), how:"One pump on damp skin, 30–45s of gentle circles (easy on the nose folds). Rinse very thoroughly — jawline & hairline too. Pat dry.", note:"Fully dry before treatments.", wait:300, waitLbl:"until fully dry"});
+
+    if(retTonight){
+      s.push(
+        {id:"sand1", t:"Moisturizer base layer", how:"Thin layer of Toleriane Double Repair over the whole face — this is the bottom slice of the retinoid sandwich.", note:"", wait:300, waitLbl:"before retinoid"},
+        {id:"ret", t:(settings.phase>=4?"Tretinoin 0.025%":"Retinoid (pea size)"), how:"ONE pea for the entire face. Dot on forehead & cheeks, spread thin. Completely avoid mouth corners, nose folds & eyelids" + (settings.phase>=4?".":" while you're new to it."), note:"No azelaic or metronidazole tonight — retinoid works alone.", wait:300, waitLbl:"to settle"},
+        {id:"sand2", t:"Moisturizer top layer", how:"Second thin layer of Double Repair over everything — top slice of the sandwich. Done, nothing on top.", note:"", wait:0}
+      );
+      return s;
+    }
+    if(o.metro) s.push({id:"metro", t:"Metronidazole", how:"Thin layer on PD-prone areas only (as your derm directed).", note:"", wait:300, waitLbl:"before azelaic"});
+    s.push({id:"aza-pm", t:"Azelaic acid 15%", how:"Same as morning: pea-to-almond size, thin & even over the whole face, into the nose folds.", note:"Random bump? Dab a little extra right on it at the end.", wait:300, waitLbl:"to sink in"});
+    if(o.milk) s.push({id:"milk", t:"Glazing Milk", how:"Small amount pressed gently into the skin.", note:"", wait:60, waitLbl:"quick set"});
+    s.push({id:"moist-pm", t:"Toleriane Double Repair", how:"Nickel-sized amount, pressed in. Whisper-thin on the perioral zone & nose folds. Done — nothing on top.", note:"", wait:0});
+    return s;
+  }
+
+  // ================= audio =================
+  let actx = null;
+  function unlockAudio(){ try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch(e){} }
+  function chime(){
+    try{
+      unlockAudio();
+      const now = actx.currentTime;
+      [[523.25,0],[659.25,.18],[783.99,.36]].forEach(([f,dt])=>{
+        const osc = actx.createOscillator(), g = actx.createGain();
+        osc.type="sine"; osc.frequency.value=f;
+        g.gain.setValueAtTime(0.0001, now+dt);
+        g.gain.exponentialRampToValueAtTime(0.22, now+dt+0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+dt+0.9);
+        osc.connect(g); g.connect(actx.destination);
+        osc.start(now+dt); osc.stop(now+dt+1);
+      });
+    }catch(e){}
+  }
+
+  // ================= render =================
+  const $ = id => document.getElementById(id);
+  const fmt = sec => Math.floor(sec/60) + ":" + String(sec%60).padStart(2,"0");
+  const key = id => mode + ":" + id;
+
+  function render(){
+    document.body.dataset.mode = mode;
+    const {dow, vitCToday, retTonight} = todayInfo();
+    const now = new Date();
+
+    $("dateLine").textContent = now.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
+    $("modeTitle").textContent = mode==="am" ? "Rise & glow ☀️" : "Wind down 🌙";
+    $("modeSub").textContent = mode==="am"
+      ? "Lukewarm water only · pat, never rub · thin layers win"
+      : "Nothing goes on top of the last step";
+
+    // phase picker
+    const pp = $("phasePicker"); pp.innerHTML = "";
+    for(let p=1; p<=4; p++){
+      const b = document.createElement("button");
+      b.className = "phase" + (settings.phase===p?" active":"");
+      b.setAttribute("role","tab"); b.setAttribute("aria-selected", settings.phase===p);
+      b.innerHTML = '<div class="p-num">'+p+'</div><div class="p-name">'+PHASES[p].name+'</div>';
+      b.onclick = ()=>{ settings.phase = p; clearTimer(); saveSettings(); render(); };
+      pp.appendChild(b);
+    }
+    $("phaseDesc").textContent = PHASES[settings.phase].desc;
+    $("phaseNote").innerHTML = PHASES[settings.phase].note;
+
+    $("amBtn").classList.toggle("active", mode==="am");
+    $("pmBtn").classList.toggle("active", mode==="pm");
+    $("amBtn").setAttribute("aria-selected", mode==="am");
+    $("pmBtn").setAttribute("aria-selected", mode==="pm");
+
+    // banner
+    let bMain="", bSub="";
+    if(mode==="am"){
+      if(settings.phase>=2){
+        if(vitCToday){ bMain="Today is a vitamin C morning 🍊"; bSub="Vitamin C → azelaic → moisturizer → SPF"; }
+        else { bMain="Rest morning — no vitamin C today"; bSub="Just azelaic → moisturizer → SPF"; }
+      } else { bMain="Azelaic morning, as every morning"; bSub="Simple & identical — that's the Phase 1 strategy"; }
+    } else {
+      if(retTonight){ bMain="Tonight is a "+(settings.phase>=4?"TRETINOIN":"RETINOID")+" night 🌙"; bSub="Azelaic takes the night off · sandwich method · pea size only"; }
+      else if(settings.phase>=3){ bMain="Tonight is an azelaic night"; bSub="No retinoid tonight — azelaic runs the show"; }
+      else { bMain="Azelaic tonight, as every night"; bSub=settings.opts.metro?"Metronidazole first, then azelaic":"Cleanse → azelaic → moisturize"; }
+    }
+    $("banner").innerHTML = '<div class="b-main">'+bMain+'</div><div class="b-sub">'+bSub+'</div>';
+
+    // week strip
+    const wk = $("week"); wk.innerHTML = "";
+    let activeDays, cap, letter;
+    if(mode==="pm" && settings.phase>=3){ activeDays = RET_DAYS[settings.retFreq]; cap = "Marked nights = "+(settings.phase>=4?"tretinoin":"retinoid")+" · all other nights = azelaic"; letter="R"; }
+    else if(mode==="am" && settings.phase>=2){ activeDays = VITC_DAYS[settings.vitcFreq]; cap = settings.vitcFreq==="daily" ? "Vitamin C every morning" : "Marked mornings = vitamin C days"; letter="C"; }
+    else { activeDays = [0,1,2,3,4,5,6]; cap = "Azelaic acid every day — your constant"; letter="A"; }
+    for(let d=0; d<7; d++){
+      const el = document.createElement("div");
+      el.className = "day" + (activeDays.includes(d)?" is-active":"") + (d===dow?" is-today":"");
+      el.innerHTML = '<div class="d-lbl">'+DAY_NAMES[d]+'</div><div class="d-dot">'+(activeDays.includes(d)?letter:"·")+'</div>';
+      wk.appendChild(el);
+    }
+    $("weekCaption").textContent = cap;
+
+    // options row (chips + frequency selectors)
+    const opt = $("options"); opt.innerHTML = "";
+    if(mode==="pm"){
+      [["makeup","Wearing makeup today"],["metro","Metronidazole night"],["milk","Glazing Milk layer"]].forEach(([id,label])=>{
+        if((id==="metro"||id==="milk") && todayInfo().retTonight) return; // hidden on retinoid nights
+        const c = document.createElement("button");
+        c.className="chip"; c.setAttribute("aria-pressed", settings.opts[id]);
+        c.innerHTML = '<span class="dot"></span>'+label;
+        c.onclick = ()=>{ settings.opts[id]=!settings.opts[id]; clearTimer(); saveSettings(); render(); };
+        opt.appendChild(c);
+      });
+      if(settings.phase>=3){
+        opt.appendChild(freqControl("Retinoid nights", "retFreq", [["2x","2×/week"],["3x","3×/week"],["4x","4×/week"]]));
+      }
+    } else if(settings.phase>=2){
+      opt.appendChild(freqControl("Vitamin C", "vitcFreq", [["3x","3×/week"],["daily","Daily"]]));
+    }
+
+    renderSteps();
+  }
+
+  function freqControl(label, keyName, choices){
+    const w = document.createElement("label");
+    w.className="freq"; w.textContent = label + " ";
+    const sel = document.createElement("select");
+    choices.forEach(([v,txt])=>{
+      const o = document.createElement("option");
+      o.value=v; o.textContent=txt; if(settings[keyName]===v) o.selected=true;
+      sel.appendChild(o);
+    });
+    sel.onchange = ()=>{ settings[keyName]=sel.value; clearTimer(); saveSettings(); render(); };
+    w.appendChild(sel);
+    return w;
+  }
+
+  function renderSteps(){
+    const steps = buildSteps();
+    const firstUndone = steps.findIndex(s=>!done[key(s.id)]);
+    const wrap = $("steps"); wrap.innerHTML = "";
+
+    steps.forEach((s, vi)=>{
+      const isDone = !!done[key(s.id)];
+      const card = document.createElement("div");
+      card.className = "step" + (isDone?" done":"") + (vi===firstUndone && !(timer&&timer.remaining>0)?" next-up":"");
+
+      const chk = document.createElement("button");
+      chk.className="check";
+      chk.setAttribute("aria-label",(isDone?"Uncheck ":"Check off ")+s.t);
+      chk.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7.5 L5.5 11 L12 3.5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      chk.onclick = ()=> toggleStep(s);
+
+      const body = document.createElement("div");
+      body.className="body";
+      let inner =
+        '<div class="step-label">Step '+(vi+1)+' of '+steps.length+'</div>' +
+        '<div class="step-title">'+s.t+'</div>' +
+        '<div class="step-how">'+s.how+'</div>' +
+        (s.note?'<div class="step-note">'+s.note+'</div>':'');
+      if(s.wait>0 && !isDone) inner += '<div class="wait-tag">⏱ wait '+fmt(s.wait)+' '+(s.waitLbl||"")+'</div>';
+      body.innerHTML = inner;
+
+      if(timer && timer.id === key(s.id)){
+        const finished = timer.remaining<=0;
+        const t = document.createElement("div");
+        t.className="timer running"+(finished?" finished":"");
+        const r=19, C=2*Math.PI*r, off = finished?0:C*(timer.remaining/timer.total);
+        t.innerHTML =
+          '<svg class="ring" viewBox="0 0 44 44"><circle class="track" cx="22" cy="22" r="'+r+'"/><circle class="arc" cx="22" cy="22" r="'+r+'" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg>' +
+          '<div><div class="t-num">'+(finished?"Ready!":fmt(timer.remaining))+'</div>' +
+          '<div class="t-lbl">'+(finished?"apply the next step ✨":"wait "+(s.waitLbl||""))+'</div></div>' +
+          (finished?'':'<button class="skip">skip wait</button>');
+        const sk = t.querySelector(".skip");
+        if(sk) sk.onclick = ()=> finishTimer(false);
+        body.appendChild(t);
+      }
+
+      card.appendChild(chk); card.appendChild(body); wrap.appendChild(card);
+    });
+
+    const doneCount = steps.filter(s=>done[key(s.id)]).length;
+    $("bar").style.width = (steps.length? doneCount/steps.length*100 : 0)+"%";
+    const all = steps.length>0 && doneCount===steps.length;
+    $("allDone").classList.toggle("show", all);
+    $("doneMsg").textContent = mode==="am" ? "Morning routine complete ✨" : "Evening routine complete 🌙";
+    $("doneSub").textContent = mode==="am" ? "SPF is on — the hard part is done. See you tonight." : "Nothing else goes on top. Fresh pillowcase energy.";
+  }
+
+  // ================= timer logic =================
+  function toggleStep(s){
+    unlockAudio();
+    const k = key(s.id);
+    if(done[k]){
+      delete done[k];
+      if(timer && timer.id===k) clearTimer();
+      saveDaily(); render(); return;
+    }
+    done[k] = true;
+    clearTimer();
+    if(s.wait>0){
+      timer = {id:k, remaining:s.wait, total:s.wait};
+      tick = setInterval(()=>{
+        timer.remaining--;
+        if(timer.remaining<=0) finishTimer(true);
+        else renderSteps();
+      },1000);
+    }
+    saveDaily(); render();
+  }
+  function finishTimer(sound){
+    clearInterval(tick); tick=null;
+    if(!timer) return;
+    timer.remaining = 0;
+    if(sound) chime();
+    renderSteps();
+    const next = document.querySelector(".step.next-up");
+    if(next) next.classList.add("ready-pulse");
+    setTimeout(()=>{ if(timer && timer.remaining<=0){ timer=null; renderSteps(); } }, 4000);
+  }
+  function clearTimer(){ clearInterval(tick); tick=null; timer=null; }
+
+  // ================= wiring =================
+  $("amBtn").onclick = ()=>{ if(mode!=="am"){ clearTimer(); mode="am"; render(); } };
+  $("pmBtn").onclick = ()=>{ if(mode!=="pm"){ clearTimer(); mode="pm"; render(); } };
+  $("resetBtn").onclick = ()=>{
+    clearTimer();
+    const steps = buildSteps();
+    steps.forEach(s=>delete done[key(s.id)]);
+    saveDaily(); render();
+  };
+
+  loadSaved().then(render);
+  render();
+})();
+</script>
+</body>
+</html>
