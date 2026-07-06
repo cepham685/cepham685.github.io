@@ -84,7 +84,11 @@
     background:var(--card); border:1.5px solid var(--line); border-radius:14px;
     padding:10px 10px 9px; margin-bottom:14px;
   }
-  .day{flex:1; text-align:center;}
+  .day{
+    flex:1; text-align:center; background:none; border:none; padding:2px 0 3px;
+    font-family:'Karla',sans-serif; cursor:pointer; border-radius:10px;
+  }
+  .day:hover .d-dot{border-color:var(--accent);}
   .day .d-lbl{font-size:9.5px; font-weight:700; letter-spacing:.08em; color:var(--muted);}
   .day .d-dot{
     margin:5px auto 0; width:26px; height:26px; border-radius:50%;
@@ -94,7 +98,24 @@
   .day.is-active .d-dot{background:var(--accent); color:#fff; border-color:var(--accent);}
   .day.is-today .d-lbl{color:var(--accent-deep);}
   .day.is-today .d-dot{box-shadow:0 0 0 2.5px var(--accent-soft), 0 0 0 4px var(--accent);}
+  .day.is-preview .d-lbl{color:var(--accent-deep);}
+  .day.is-preview .d-dot{box-shadow:0 0 0 2.5px var(--paper), 0 0 0 4px var(--accent-deep); border-style:dashed;}
   .week-caption{font-size:11px; color:var(--muted); text-align:center; margin:-8px 0 14px;}
+
+  /* preview-a-day mode */
+  .preview-note{
+    display:none; align-items:center; justify-content:center; gap:10px;
+    background:var(--accent-soft); border:1.5px dashed var(--accent);
+    border-radius:14px; padding:10px 14px; margin-bottom:14px;
+    font-size:12.5px; font-weight:600; color:var(--accent-deep);
+  }
+  .preview-note.show{display:flex; flex-wrap:wrap;}
+  .preview-note button{
+    border:1.5px solid var(--accent); background:var(--card); color:var(--accent-deep);
+    font-family:'Karla',sans-serif; font-weight:700; font-size:12px;
+    border-radius:999px; padding:5px 13px; cursor:pointer;
+  }
+  .step.previewing .check{opacity:.35; border-style:dashed; cursor:default;}
 
   /* settings + option chips */
   .options{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px;}
@@ -218,6 +239,7 @@
     <button id="pmBtn" role="tab">🌙 PM</button>
   </div>
 
+  <div class="preview-note" id="previewNote"><span id="previewNoteText"></span><button id="backToday">Back to today</button></div>
   <div class="banner" id="banner"></div>
   <div class="week" id="week"></div>
   <div class="week-caption" id="weekCaption"></div>
@@ -262,10 +284,14 @@ window.storage = {
 
   // ================= state =================
   let mode = new Date().getHours() >= 16 ? "pm" : "am";
-  let settings = {phase:1, vitcFreq:"3x", retFreq:"2x", opts:{makeup:true, metro:false, milk:false}};
+  let settings = {phase:1, vitcFreq:"3x", retFreq:"2x", opts:{makeup:true, milk:false}};
   let done = {}; // stepId -> true, per mode: keys like "am:rinse"
+  let flags = {metroSkip:false}; // today-only overrides, reset each new day
   let timer = null, tick = null;
+  let previewOffset = 0; // 0 = today, 1-6 = days ahead being previewed (read-only)
   const todayKey = new Date().toDateString();
+
+  function viewDate(){ const d = new Date(); d.setDate(d.getDate() + previewOffset); return d; }
 
   // ---- optional persistence (works when opened as a live Claude artifact) ----
   const hasStore = typeof window !== "undefined" && window.storage && typeof window.storage.get === "function";
@@ -287,12 +313,12 @@ window.storage = {
     }
     try{
       const s = await window.storage.get("skincare-settings");
-      if(s && s.value){ const v = JSON.parse(s.value); settings = Object.assign(settings, v); settings.opts = Object.assign({makeup:true,metro:false,milk:false}, v.opts||{}); }
+      if(s && s.value){ const v = JSON.parse(s.value); settings = Object.assign(settings, v); settings.opts = Object.assign({makeup:true,milk:false}, v.opts||{}); }
       storeConfirmedWorking = true;
     }catch(e){ /* key just doesn't exist yet on first-ever open — that's fine */ storeConfirmedWorking = true; }
     try{
       const d = await window.storage.get("skincare-daily");
-      if(d && d.value){ const v = JSON.parse(d.value); if(v.date === todayKey) done = v.done || {}; }
+      if(d && d.value){ const v = JSON.parse(d.value); if(v.date === todayKey){ done = v.done || {}; flags = Object.assign({metroSkip:false}, v.flags||{}); } }
     }catch(e){}
     flashSaveStatus(true, storeConfirmedWorking ? "Settings & today's progress loaded" : "Saved to this device");
     setTimeout(()=>{ const el=document.getElementById("saveStatus"); if(el) el.classList.remove("show"); }, 3500);
@@ -306,20 +332,25 @@ window.storage = {
   }
   function saveDaily(){
     if(!hasStore) return;
-    window.storage.set("skincare-daily", JSON.stringify({date:todayKey, done})).catch(()=>{});
+    window.storage.set("skincare-daily", JSON.stringify({date:todayKey, done, flags})).catch(()=>{});
   }
 
   // ================= schedule logic =================
+  const METRO_ANCHOR = new Date(2026, 0, 1); // fixed reference date so the 2-day cycle never drifts
+  function epochDays(d){ return Math.floor((new Date(d.getFullYear(),d.getMonth(),d.getDate()) - new Date(METRO_ANCHOR.getFullYear(),METRO_ANCHOR.getMonth(),METRO_ANCHOR.getDate())) / 86400000); }
   function todayInfo(){
-    const dow = new Date().getDay();
+    const now = viewDate();
+    const dow = now.getDay();
     const vitCToday = settings.phase >= 2 && VITC_DAYS[settings.vitcFreq].includes(dow);
     const retTonight = settings.phase >= 3 && RET_DAYS[settings.retFreq].includes(dow);
-    return {dow, vitCToday, retTonight};
+    const metroScheduled = !retTonight && (epochDays(now) % 2 === 0); // every other night, off entirely on retinoid nights
+    return {dow, vitCToday, retTonight, metroScheduled};
   }
 
   // ================= steps =================
   function buildSteps(){
-    const {vitCToday, retTonight} = todayInfo();
+    const {vitCToday, retTonight, metroScheduled} = todayInfo();
+    const metroToday = metroScheduled && !(previewOffset === 0 && flags.metroSkip);
     const o = settings.opts;
     if(mode === "am"){
       const s = [
@@ -347,7 +378,7 @@ window.storage = {
       );
       return s;
     }
-    if(o.metro) s.push({id:"metro", t:"Metronidazole", how:"Thin layer on PD-prone areas only (as your derm directed).", note:"", wait:300, waitLbl:"before azelaic"});
+    if(metroToday) s.push({id:"metro", t:"Metronidazole", how:"Thin layer on PD-prone areas only (as your derm directed).", note:"Every-other-night schedule — tomorrow is an azelaic-only night.", wait:300, waitLbl:"before azelaic"});
     s.push({id:"aza-pm", t:"Azelaic acid 15%", how:"Same as morning: pea-to-almond size, thin & even over the whole face, into the nose folds.", note:"Random bump? Dab a little extra right on it at the end.", wait:300, waitLbl:"to sink in"});
     if(o.milk) s.push({id:"milk", t:"Glazing Milk", how:"Small amount pressed gently into the skin.", note:"", wait:60, waitLbl:"quick set"});
     s.push({id:"moist-pm", t:"Toleriane Double Repair", how:"Nickel-sized amount, pressed in. Whisper-thin on the perioral zone & nose folds. Done — nothing on top.", note:"", wait:0});
@@ -380,11 +411,16 @@ window.storage = {
 
   function render(){
     document.body.dataset.mode = mode;
-    const {dow, vitCToday, retTonight} = todayInfo();
-    const now = new Date();
+    const {dow, vitCToday, retTonight, metroScheduled} = todayInfo();
+    const metroToday = metroScheduled && !(previewOffset === 0 && flags.metroSkip);
+    const now = viewDate();
+    const previewing = previewOffset > 0;
+    const dayName = now.toLocaleDateString(undefined,{weekday:"long"});
 
-    $("dateLine").textContent = now.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
+    $("dateLine").textContent = (previewing ? "Previewing · " : "") + now.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
     $("modeTitle").textContent = mode==="am" ? "Rise & glow ☀️" : "Wind down 🌙";
+    $("previewNote").classList.toggle("show", previewing);
+    $("previewNoteText").textContent = previewing ? "👀 Peeking at "+dayName+"'s "+(mode==="am"?"morning":"night")+" — look, don't check" : "";
     $("modeSub").textContent = mode==="am"
       ? "Lukewarm water only · pat, never rub · thin layers win"
       : "Nothing goes on top of the last step";
@@ -409,15 +445,17 @@ window.storage = {
 
     // banner
     let bMain="", bSub="";
+    const todayWord = previewing ? dayName : "Today";
+    const tonightWord = previewing ? dayName+" night" : "Tonight";
     if(mode==="am"){
       if(settings.phase>=2){
-        if(vitCToday){ bMain="Today is a vitamin C morning 🍊"; bSub="Vitamin C → azelaic → moisturizer → SPF"; }
-        else { bMain="Rest morning — no vitamin C today"; bSub="Just azelaic → moisturizer → SPF"; }
-      } else { bMain="Azelaic morning, as every morning"; bSub="Simple & identical — that's the Phase 1 strategy"; }
+        if(vitCToday){ bMain=todayWord+" is a vitamin C morning 🍊"; bSub="Vitamin C → azelaic → moisturizer → SPF"; }
+        else { bMain=previewing ? dayName+" is a rest morning — no vitamin C" : "Rest morning — no vitamin C today"; bSub="Just azelaic → moisturizer → SPF"; }
+      } else { bMain=previewing ? dayName+": azelaic morning, as every morning" : "Azelaic morning, as every morning"; bSub="Simple & identical — that's the Phase 1 strategy"; }
     } else {
-      if(retTonight){ bMain="Tonight is a "+(settings.phase>=4?"TRETINOIN":"RETINOID")+" night 🌙"; bSub="Azelaic takes the night off · sandwich method · pea size only"; }
-      else if(settings.phase>=3){ bMain="Tonight is an azelaic night"; bSub="No retinoid tonight — azelaic runs the show"; }
-      else { bMain="Azelaic tonight, as every night"; bSub=settings.opts.metro?"Metronidazole first, then azelaic":"Cleanse → azelaic → moisturize"; }
+      if(retTonight){ bMain=tonightWord+" is a "+(settings.phase>=4?"TRETINOIN":"RETINOID")+" night 🌙"; bSub="Azelaic takes the night off · sandwich method · pea size only"; }
+      else if(settings.phase>=3){ bMain=tonightWord+" is an azelaic night"; bSub=metroToday?"Metronidazole first, then azelaic":"No retinoid "+(previewing?"that night":"tonight")+" — azelaic runs the show"; }
+      else { bMain=metroToday?tonightWord+" is a metronidazole night 💧":(previewing?dayName+" night: azelaic, as every night":"Azelaic tonight, as every night"); bSub=metroToday?"Metronidazole first, then azelaic — the next night is azelaic-only":"Cleanse → azelaic → moisturize"; }
     }
     $("banner").innerHTML = '<div class="b-main">'+bMain+'</div><div class="b-sub">'+bSub+'</div>';
 
@@ -426,33 +464,44 @@ window.storage = {
     let activeDays, cap, letter;
     if(mode==="pm" && settings.phase>=3){ activeDays = RET_DAYS[settings.retFreq]; cap = "Marked nights = "+(settings.phase>=4?"tretinoin":"retinoid")+" · all other nights = azelaic"; letter="R"; }
     else if(mode==="am" && settings.phase>=2){ activeDays = VITC_DAYS[settings.vitcFreq]; cap = settings.vitcFreq==="daily" ? "Vitamin C every morning" : "Marked mornings = vitamin C days"; letter="C"; }
-    else { activeDays = [0,1,2,3,4,5,6]; cap = "Azelaic acid every day — your constant"; letter="A"; }
+    else { activeDays = [0,1,2,3,4,5,6]; cap = "Azelaic every day · metronidazole alternates night-to-night (see banner above)"; letter="A"; }
+    const realDow = new Date().getDay();
     for(let d=0; d<7; d++){
-      const el = document.createElement("div");
-      el.className = "day" + (activeDays.includes(d)?" is-active":"") + (d===dow?" is-today":"");
+      const el = document.createElement("button");
+      el.className = "day" + (activeDays.includes(d)?" is-active":"") + (d===realDow?" is-today":"") + (previewing && d===dow?" is-preview":"");
+      el.setAttribute("aria-label", (d===realDow?"Back to today":"Preview "+DAY_NAMES[d]));
       el.innerHTML = '<div class="d-lbl">'+DAY_NAMES[d]+'</div><div class="d-dot">'+(activeDays.includes(d)?letter:"·")+'</div>';
+      el.onclick = ()=>{ previewOffset = (d - realDow + 7) % 7; clearTimer(); render(); };
       wk.appendChild(el);
     }
-    $("weekCaption").textContent = cap;
+    $("weekCaption").textContent = previewing ? cap + " · tap today's ring to come back" : cap + " · tap a day to peek ahead";
 
-    // options row (chips + frequency selectors)
+    // options row (chips + frequency selectors) — hidden while previewing another day
     const opt = $("options"); opt.innerHTML = "";
-    if(mode==="pm"){
-      [["makeup","Wearing makeup today"],["metro","Metronidazole night"],["milk","Glazing Milk layer"]].forEach(([id,label])=>{
-        if((id==="metro"||id==="milk") && todayInfo().retTonight) return; // hidden on retinoid nights
+    if(mode==="pm" && !previewing){
+      [["makeup","Wearing makeup today"],["milk","Glazing Milk layer"]].forEach(([id,label])=>{
+        if(id==="milk" && retTonight) return; // hidden on retinoid nights
         const c = document.createElement("button");
         c.className="chip"; c.setAttribute("aria-pressed", settings.opts[id]);
         c.innerHTML = '<span class="dot"></span>'+label;
         c.onclick = ()=>{ settings.opts[id]=!settings.opts[id]; clearTimer(); saveSettings(); render(); };
         opt.appendChild(c);
       });
+      if(metroScheduled){
+        const c = document.createElement("button");
+        c.className="chip"; c.setAttribute("aria-pressed", flags.metroSkip);
+        c.innerHTML = '<span class="dot"></span>'+(flags.metroSkip?"Metro skipped tonight":"Skip metronidazole tonight");
+        c.onclick = ()=>{ flags.metroSkip=!flags.metroSkip; clearTimer(); saveDaily(); render(); };
+        opt.appendChild(c);
+      }
       if(settings.phase>=3){
         opt.appendChild(freqControl("Retinoid nights", "retFreq", [["2x","2×/week"],["3x","3×/week"],["4x","4×/week"]]));
       }
-    } else if(settings.phase>=2){
+    } else if(mode==="am" && !previewing && settings.phase>=2){
       opt.appendChild(freqControl("Vitamin C", "vitcFreq", [["3x","3×/week"],["daily","Daily"]]));
     }
 
+    $("resetBtn").style.display = previewing ? "none" : "block";
     renderSteps();
   }
 
@@ -471,20 +520,22 @@ window.storage = {
   }
 
   function renderSteps(){
+    const previewing = previewOffset > 0;
     const steps = buildSteps();
-    const firstUndone = steps.findIndex(s=>!done[key(s.id)]);
+    const firstUndone = previewing ? -1 : steps.findIndex(s=>!done[key(s.id)]);
     const wrap = $("steps"); wrap.innerHTML = "";
 
     steps.forEach((s, vi)=>{
-      const isDone = !!done[key(s.id)];
+      const isDone = !previewing && !!done[key(s.id)];
       const card = document.createElement("div");
-      card.className = "step" + (isDone?" done":"") + (vi===firstUndone && !(timer&&timer.remaining>0)?" next-up":"");
+      card.className = "step" + (previewing?" previewing":"") + (isDone?" done":"") + (vi===firstUndone && !(timer&&timer.remaining>0)?" next-up":"");
 
       const chk = document.createElement("button");
       chk.className="check";
-      chk.setAttribute("aria-label",(isDone?"Uncheck ":"Check off ")+s.t);
+      chk.disabled = previewing;
+      chk.setAttribute("aria-label", previewing ? "Preview only" : (isDone?"Uncheck ":"Check off ")+s.t);
       chk.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7.5 L5.5 11 L12 3.5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      chk.onclick = ()=> toggleStep(s);
+      if(!previewing) chk.onclick = ()=> toggleStep(s);
 
       const body = document.createElement("div");
       body.className="body";
@@ -514,9 +565,9 @@ window.storage = {
       card.appendChild(chk); card.appendChild(body); wrap.appendChild(card);
     });
 
-    const doneCount = steps.filter(s=>done[key(s.id)]).length;
+    const doneCount = previewing ? 0 : steps.filter(s=>done[key(s.id)]).length;
     $("bar").style.width = (steps.length? doneCount/steps.length*100 : 0)+"%";
-    const all = steps.length>0 && doneCount===steps.length;
+    const all = !previewing && steps.length>0 && doneCount===steps.length;
     $("allDone").classList.toggle("show", all);
     $("doneMsg").textContent = mode==="am" ? "Morning routine complete ✨" : "Evening routine complete 🌙";
     $("doneSub").textContent = mode==="am" ? "SPF is on — the hard part is done. See you tonight." : "Nothing else goes on top. Fresh pillowcase energy.";
@@ -556,6 +607,7 @@ window.storage = {
   function clearTimer(){ clearInterval(tick); tick=null; timer=null; }
 
   // ================= wiring =================
+  $("backToday").onclick = ()=>{ previewOffset = 0; render(); };
   $("amBtn").onclick = ()=>{ if(mode!=="am"){ clearTimer(); mode="am"; render(); } };
   $("pmBtn").onclick = ()=>{ if(mode!=="pm"){ clearTimer(); mode="pm"; render(); } };
   $("resetBtn").onclick = ()=>{
