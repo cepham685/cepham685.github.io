@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#F6F7F3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
+<style is:global>
   :root{
     --sage:#7C9473; --sage-soft:#EAF0E6; --sage-deep:#5C7355;
     --slate:#5A6B85; --slate-soft:#E7EBF2; --slate-deep:#3D4A61;
@@ -102,19 +102,6 @@
   .day.is-preview .d-dot{box-shadow:0 0 0 2.5px var(--paper), 0 0 0 4px var(--accent-deep); border-style:dashed;}
   .week-caption{font-size:11px; color:var(--muted); text-align:center; margin:-8px 0 14px;}
 
-  /* preview-a-day mode */
-  .preview-note{
-    display:none; align-items:center; justify-content:center; gap:10px;
-    background:var(--accent-soft); border:1.5px dashed var(--accent);
-    border-radius:14px; padding:10px 14px; margin-bottom:14px;
-    font-size:12.5px; font-weight:600; color:var(--accent-deep);
-  }
-  .preview-note.show{display:flex; flex-wrap:wrap;}
-  .preview-note button{
-    border:1.5px solid var(--accent); background:var(--card); color:var(--accent-deep);
-    font-family:'Karla',sans-serif; font-weight:700; font-size:12px;
-    border-radius:999px; padding:5px 13px; cursor:pointer;
-  }
   .step.previewing .check{opacity:.35; border-style:dashed; cursor:default;}
 
   /* settings + option chips */
@@ -239,7 +226,6 @@
     <button id="pmBtn" role="tab">🌙 PM</button>
   </div>
 
-  <div class="preview-note" id="previewNote"><span id="previewNoteText"></span><button id="backToday">Back to today</button></div>
   <div class="banner" id="banner"></div>
   <div class="week" id="week"></div>
   <div class="week-caption" id="weekCaption"></div>
@@ -419,8 +405,6 @@ window.storage = {
 
     $("dateLine").textContent = (previewing ? "Previewing · " : "") + now.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"});
     $("modeTitle").textContent = mode==="am" ? "Rise & glow ☀️" : "Wind down 🌙";
-    $("previewNote").classList.toggle("show", previewing);
-    $("previewNoteText").textContent = previewing ? "👀 Peeking at "+dayName+"'s "+(mode==="am"?"morning":"night")+" — look, don't check" : "";
     $("modeSub").textContent = mode==="am"
       ? "Lukewarm water only · pat, never rub · thin layers win"
       : "Nothing goes on top of the last step";
@@ -607,7 +591,6 @@ window.storage = {
   function clearTimer(){ clearInterval(tick); tick=null; timer=null; }
 
   // ================= wiring =================
-  $("backToday").onclick = ()=>{ previewOffset = 0; render(); };
   $("amBtn").onclick = ()=>{ if(mode!=="am"){ clearTimer(); mode="am"; render(); } };
   $("pmBtn").onclick = ()=>{ if(mode!=="pm"){ clearTimer(); mode="pm"; render(); } };
   $("resetBtn").onclick = ()=>{
