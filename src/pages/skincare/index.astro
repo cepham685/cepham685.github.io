@@ -304,7 +304,26 @@ window.storage = {
     }catch(e){ /* key just doesn't exist yet on first-ever open — that's fine */ storeConfirmedWorking = true; }
     try{
       const d = await window.storage.get("skincare-daily");
-      if(d && d.value){ const v = JSON.parse(d.value); if(v.date === todayKey){ done = v.done || {}; flags = Object.assign({metroSkip:false}, v.flags||{}); } }
+      if(d && d.value){
+        const v = JSON.parse(d.value);
+        if(v.date === todayKey){
+          done = v.done || {};
+          flags = Object.assign({metroSkip:false}, v.flags||{});
+          if(v.timer && v.timer.id && v.timer.endsAt){
+            timer = {
+              id:v.timer.id,
+              total:v.timer.total || Math.max(0, Math.ceil((v.timer.endsAt - Date.now())/1000)),
+              endsAt:v.timer.endsAt,
+              remaining:0,
+              finished:false
+            };
+            updateTimer();
+            if(timer.remaining > 0) startTimerTick();
+            else if(Date.now() - timer.endsAt > 5*60*1000) timer = null;
+            else setTimeout(()=>{ if(timer && timer.remaining<=0){ timer=null; saveDaily(); renderSteps(); } }, 4000);
+          }
+        }
+      }
     }catch(e){}
     flashSaveStatus(true, storeConfirmedWorking ? "Settings & today's progress loaded" : "Saved to this device");
     setTimeout(()=>{ const el=document.getElementById("saveStatus"); if(el) el.classList.remove("show"); }, 3500);
@@ -318,7 +337,9 @@ window.storage = {
   }
   function saveDaily(){
     if(!hasStore) return;
-    window.storage.set("skincare-daily", JSON.stringify({date:todayKey, done, flags})).catch(()=>{});
+    updateTimer();
+    const activeTimer = timer ? {id:timer.id, total:timer.total, endsAt:timer.endsAt} : null;
+    window.storage.set("skincare-daily", JSON.stringify({date:todayKey, done, flags, timer:activeTimer})).catch(()=>{});
   }
 
   // ================= schedule logic =================
@@ -504,6 +525,7 @@ window.storage = {
   }
 
   function renderSteps(){
+    updateTimer();
     const previewing = previewOffset > 0;
     const steps = buildSteps();
     const firstUndone = previewing ? -1 : steps.findIndex(s=>!done[key(s.id)]);
@@ -558,6 +580,20 @@ window.storage = {
   }
 
   // ================= timer logic =================
+  function updateTimer(){
+    if(!timer) return;
+    timer.remaining = Math.max(0, Math.ceil((timer.endsAt - Date.now())/1000));
+  }
+  function startTimerTick(){
+    clearInterval(tick);
+    tick = setInterval(tickTimer, 1000);
+  }
+  function tickTimer(){
+    if(!timer) return;
+    updateTimer();
+    if(timer.remaining <= 0) finishTimer(true);
+    else renderSteps();
+  }
   function toggleStep(s){
     unlockAudio();
     const k = key(s.id);
@@ -569,24 +605,23 @@ window.storage = {
     done[k] = true;
     clearTimer();
     if(s.wait>0){
-      timer = {id:k, remaining:s.wait, total:s.wait};
-      tick = setInterval(()=>{
-        timer.remaining--;
-        if(timer.remaining<=0) finishTimer(true);
-        else renderSteps();
-      },1000);
+      timer = {id:k, remaining:s.wait, total:s.wait, endsAt:Date.now() + s.wait*1000, finished:false};
+      startTimerTick();
     }
     saveDaily(); render();
   }
   function finishTimer(sound){
     clearInterval(tick); tick=null;
     if(!timer) return;
+    if(timer.finished) return;
+    timer.finished = true;
     timer.remaining = 0;
     if(sound) chime();
     renderSteps();
     const next = document.querySelector(".step.next-up");
     if(next) next.classList.add("ready-pulse");
-    setTimeout(()=>{ if(timer && timer.remaining<=0){ timer=null; renderSteps(); } }, 4000);
+    saveDaily();
+    setTimeout(()=>{ if(timer && timer.remaining<=0){ timer=null; saveDaily(); renderSteps(); } }, 4000);
   }
   function clearTimer(){ clearInterval(tick); tick=null; timer=null; }
 
@@ -599,6 +634,9 @@ window.storage = {
     steps.forEach(s=>delete done[key(s.id)]);
     saveDaily(); render();
   };
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) tickTimer(); });
+  window.addEventListener("focus", tickTimer);
+  window.addEventListener("pageshow", tickTimer);
 
   loadSaved().then(render);
   render();
