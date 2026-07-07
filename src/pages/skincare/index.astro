@@ -476,7 +476,7 @@ window.storage = {
       el.className = "day" + (activeDays.includes(d)?" is-active":"") + (d===realDow?" is-today":"") + (previewing && d===dow?" is-preview":"");
       el.setAttribute("aria-label", (d===realDow?"Back to today":"Preview "+DAY_NAMES[d]));
       el.innerHTML = '<div class="d-lbl">'+DAY_NAMES[d]+'</div><div class="d-dot">'+(activeDays.includes(d)?letter:"·")+'</div>';
-      el.onclick = ()=>{ previewOffset = (d - realDow + 7) % 7; clearTimer(); render(); };
+      el.onclick = ()=>{ previewOffset = (d - realDow + 7) % 7; render(); };
       wk.appendChild(el);
     }
     $("weekCaption").textContent = previewing ? cap + " · tap today's ring to come back" : cap + " · tap a day to peek ahead";
