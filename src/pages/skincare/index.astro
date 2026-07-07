@@ -363,6 +363,7 @@ window.storage = {
       const s = [
         {id:"rinse", t:"Water rinse", how:"Splash lukewarm water, pat dry with a clean towel. No cleanser needed.", note:"Fully dry before the next step — brush teeth while you wait (rinse toothpaste off your mouth corners!).", wait:240, waitLbl:"until fully dry"}
       ];
+      s.push({id:"caffeine-am", t:"The Ordinary Caffeine Solution 5% + EGCG", how:"One small drop total for both under-eyes. Tap along the orbital bone/eye contour; keep out of eyes and off the eyelids/lash line.", note:"Use before face serums and moisturizer so creams don't block it.", wait:60, waitLbl:"to absorb"});
       if(settings.phase >= 2 && vitCToday)
         s.push({id:"vitc", t:"Vitamin C serum", how:"3–4 drops spread over the whole face. Avoid the eyelids.", note:"", wait:150, waitLbl:"to absorb"});
       s.push(
@@ -376,6 +377,7 @@ window.storage = {
     const s = [];
     if(o.makeup) s.push({id:"cleanse1", t:"First cleanse · Toleriane Dermo", how:"2–3 pumps on a DRY face with dry hands. Massage a full 60 seconds — longest where makeup is heaviest. Rinse lukewarm.", note:"The massage time is what dissolves the makeup — don't rush it.", wait:0});
     s.push({id:"cleanse2", t:(o.makeup?"Second cleanse · Vanicream":"Cleanse · Vanicream"), how:"One pump on damp skin, 30–45s of gentle circles (easy on the nose folds). Rinse very thoroughly — jawline & hairline too. Pat dry.", note:"Fully dry before treatments.", wait:300, waitLbl:"until fully dry"});
+    s.push({id:"caffeine-pm", t:"The Ordinary Caffeine Solution 5% + EGCG", how:"One small drop total for both under-eyes. Tap along the orbital bone/eye contour; keep out of eyes and off the eyelids/lash line.", note:"Apply before moisturizer or retinoid sandwich layers.", wait:60, waitLbl:"to absorb"});
 
     if(retTonight){
       s.push(
@@ -454,13 +456,13 @@ window.storage = {
     const tonightWord = previewing ? dayName+" night" : "Tonight";
     if(mode==="am"){
       if(settings.phase>=2){
-        if(vitCToday){ bMain=todayWord+" is a vitamin C morning 🍊"; bSub="Vitamin C → azelaic → moisturizer → SPF"; }
-        else { bMain=previewing ? dayName+" is a rest morning — no vitamin C" : "Rest morning — no vitamin C today"; bSub="Just azelaic → moisturizer → SPF"; }
-      } else { bMain=previewing ? dayName+": azelaic morning, as every morning" : "Azelaic morning, as every morning"; bSub="Simple & identical — that's the Phase 1 strategy"; }
+        if(vitCToday){ bMain=todayWord+" is a vitamin C morning 🍊"; bSub="Caffeine eye serum → vitamin C → azelaic → moisturizer → SPF"; }
+        else { bMain=previewing ? dayName+" is a rest morning — no vitamin C" : "Rest morning — no vitamin C today"; bSub="Caffeine eye serum → azelaic → moisturizer → SPF"; }
+      } else { bMain=previewing ? dayName+": azelaic morning, as every morning" : "Azelaic morning, as every morning"; bSub="Caffeine eye serum → azelaic → moisturizer → SPF"; }
     } else {
-      if(retTonight){ bMain=tonightWord+" is a "+(settings.phase>=4?"TRETINOIN":"RETINOID")+" night 🌙"; bSub="Azelaic takes the night off · sandwich method · pea size only"; }
-      else if(settings.phase>=3){ bMain=tonightWord+" is an azelaic night"; bSub=metroToday?"Metronidazole first, then azelaic":"No retinoid "+(previewing?"that night":"tonight")+" — azelaic runs the show"; }
-      else { bMain=metroToday?tonightWord+" is a metronidazole night 💧":(previewing?dayName+" night: azelaic, as every night":"Azelaic tonight, as every night"); bSub=metroToday?"Metronidazole first, then azelaic — the next night is azelaic-only":"Cleanse → azelaic → moisturize"; }
+      if(retTonight){ bMain=tonightWord+" is a "+(settings.phase>=4?"TRETINOIN":"RETINOID")+" night 🌙"; bSub="Caffeine eye serum → moisturizer sandwich · azelaic takes the night off"; }
+      else if(settings.phase>=3){ bMain=tonightWord+" is an azelaic night"; bSub=metroToday?"Caffeine eye serum → metronidazole → azelaic":"No retinoid "+(previewing?"that night":"tonight")+" — caffeine eye serum, then azelaic"; }
+      else { bMain=metroToday?tonightWord+" is a metronidazole night 💧":(previewing?dayName+" night: azelaic, as every night":"Azelaic tonight, as every night"); bSub=metroToday?"Caffeine eye serum → metronidazole → azelaic → moisturize":"Cleanse → caffeine eye serum → azelaic → moisturize"; }
     }
     $("banner").innerHTML = '<div class="b-main">'+bMain+'</div><div class="b-sub">'+bSub+'</div>';
 
