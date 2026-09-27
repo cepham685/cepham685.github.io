@@ -23,7 +23,25 @@
       "WebFetch(domain:takeagander.com)",
       "WebFetch(domain:grandmatter.com)",
       "WebFetch(domain:www.tinasmithdesign.com)",
-      "WebFetch(domain:futureparis.com)"
+      "WebFetch(domain:futureparis.com)",
+      "Bash(sips -s format png \"/Users/christinapham/Claude Portfolio/public/images/partner-summit/Crete United Partner Summit 2024 Agenda-Final.pdf\" --out \"/Users/christinapham/Claude Portfolio/public/images/partner-summit/agenda-preview.png\")",
+      "Bash(sips -s format png \"Welcome Trifold_PS.pdf\" --out \"welcome-trifold-preview.png\")",
+      "Bash(sips -s format png \"Crete United Awards QR code Flyer-V2.pdf\" --out \"qr-flyer-preview.png\")",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/christinapham/Claude Portfolio/public/images/partner-summit/agenda-preview.png\" \"/Users/christinapham/Claude Portfolio/public/images/partner-summit/welcome-trifold-preview.png\" \"/Users/christinapham/Claude Portfolio/public/images/partner-summit/qr-flyer-preview.png\")",
+      "Bash(python3 -c ' *)",
+      "Bash(/usr/bin/python3 -c ' *)",
+      "Read(//System/Library/Frameworks/Quartz.framework/**)",
+      "Bash(/usr/bin/python3 -c \"import objc; print\\(objc.__version__\\)\")",
+      "Bash(swift /tmp/pdf2png.swift)",
+      "Bash(swift /tmp/check-pages.swift)",
+      "Bash(swift /tmp/pdf2png2.swift)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(mkdir -p \"/Users/christinapham/Claude Portfolio/public/skincare\" && cp \"/Users/christinapham/Downloads/skincare-routine-checklist.html\" \"/Users/christinapham/Claude Portfolio/public/skincare/index.html\")",
+      "Bash(git commit -m 'Add skincare routine tracker page *)",
+      "Bash(gh run *)",
+      "Bash(git commit -m 'Skincare tracker: clickable week days to preview any day'\\\\''s routine *)"
     ]
   }
 }
